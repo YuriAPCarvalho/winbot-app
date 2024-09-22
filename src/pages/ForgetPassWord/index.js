@@ -21,9 +21,9 @@ import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import moment from "moment";
 import logo from "../../assets/logo.png";
-import { toast } from 'react-toastify'; 
-import toastError from '../../errors/toastError';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import toastError from "../../errors/toastError";
+import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -69,97 +69,36 @@ const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ForgetPassword = () => {
   const classes = useStyles();
   const history = useHistory();
-  let companyId = null;
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-  const [showResetPasswordButton, setShowResetPasswordButton] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState(false);
   const [error, setError] = useState(""); // Estado para mensagens de erro
+  const [loading, setLoading] = useState();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const toggleAdditionalFields = () => {
-    setShowAdditionalFields(!showAdditionalFields);
-    if (showAdditionalFields) {
-      setShowResetPasswordButton(false);
-    } else {
-      setShowResetPasswordButton(true);
-    }
-  };
-
-  const params = qs.parse(window.location.search);
-  if (params.companyId !== undefined) {
-    companyId = params.companyId;
-  }
-
-  const initialState = { email: "" };
-
-  const [user] = useState(initialState);
-  const dueDate = moment().add(3, "day").format();
-
-const handleSendEmail = async (values) => {
-  const email = values.email;
-  try {
-    const response = await api.post(
-      `${process.env.REACT_APP_BACKEND_URL}/forgetpassword/${email}`
-    );
-    console.log("API Response:", response.data);
-
-    if (response.data.status === 404) {
-      toast.error("Email não encontrado");
-    } else {
-      toast.success(i18n.t("Email enviado com sucesso!"));
-    }
-  } catch (err) {
-    console.log("API Error:", err);
-    toastError(err);
-  }
-};
-
-  const handleResetPassword = async (values) => {
+  const handleSendEmail = async (values) => {
+    setLoading(true);
     const email = values.email;
-    const token = values.token;
-    const newPassword = values.newPassword;
-    const confirmPassword = values.confirmPassword;
+    try {
+      const response = await api.post(
+        `${process.env.REACT_APP_BACKEND_URL}/forgetpassword/${email}`
+      );
+      console.log("API Response:", response.data);
 
-    if (newPassword === confirmPassword) {
-      try {
-        await api.post(
-          `${process.env.REACT_APP_BACKEND_URL}/resetpasswords/${email}/${token}/${newPassword}`
-        );
-        setError(""); // Limpe o erro se não houver erro
-        toast.success(i18n.t("Senha redefinida com sucesso."));
-        history.push("/login");
-      } catch (err) {
-        console.log(err);
+      if (response.data.status === 404) {
+        toast.error("Email não encontrado");
+        setLoading(false);
+      } else {
+        setLoading(false);
+
+        setEmailSuccess(true);
+        toast.success(i18n.t("Email enviado com sucesso!"));
       }
+    } catch (err) {
+      console.log("API Error:", err);
+      toastError(err);
     }
   };
 
-  const isResetPasswordButtonClicked = showResetPasswordButton;
   const UserSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
-    newPassword: isResetPasswordButtonClicked
-      ? Yup.string()
-          .required("Campo obrigatório")
-          .matches(
-            passwordRegex,
-            "Sua senha precisa ter no mínimo 8 caracteres, sendo uma letra maiúscula, uma minúscula e um número."
-          )
-      : Yup.string(), // Sem validação se não for redefinição de senha
-    confirmPassword: Yup.string().when("newPassword", {
-      is: (newPassword) => isResetPasswordButtonClicked && newPassword,
-      then: Yup.string()
-        .oneOf([Yup.ref("newPassword"), null], "As senhas não correspondem")
-        .required("Campo obrigatório"),
-      otherwise: Yup.string(), // Sem validação se não for redefinição de senha
-    }),
   });
 
   return (
@@ -180,22 +119,11 @@ const handleSendEmail = async (values) => {
           <Formik
             initialValues={{
               email: "",
-              token: "",
-              newPassword: "",
-              confirmPassword: "",
             }}
             enableReinitialize={true}
             validationSchema={UserSchema}
             onSubmit={(values, actions) => {
-              setTimeout(() => {
-                if (showResetPasswordButton) {
-                  handleResetPassword(values);
-                } else {
-                  handleSendEmail(values);
-                }
-                actions.setSubmitting(false);
-                toggleAdditionalFields();
-              }, 400);
+              handleSendEmail(values);
             }}
           >
             {({ touched, errors, isSubmitting }) => (
@@ -215,118 +143,27 @@ const handleSendEmail = async (values) => {
                       required
                     />
                   </Grid>
-                  {showAdditionalFields && (
-                    <>
-                      <Grid item xs={12}>
-                        <Field
-                          as={TextField}
-                          variant="outlined"
-                          fullWidth
-                          id="token"
-                          label="Código de Verificação"
-                          name="token"
-                          error={touched.token && Boolean(errors.token)}
-                          helperText={touched.token && errors.token}
-                          autoComplete="off"
-                          required
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Field
-                          as={TextField}
-                          variant="outlined"
-                          fullWidth
-                          type={showPassword ? "text" : "password"}
-                          id="newPassword"
-                          label="Nova senha"
-                          name="newPassword"
-                          error={
-                            touched.newPassword &&
-                            Boolean(errors.newPassword)
-                          }
-                          helperText={
-                            touched.newPassword && errors.newPassword
-                          }
-                          autoComplete="off"
-                          required
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={togglePasswordVisibility}
-                                >
-                                  {showPassword ? (
-                                    <VisibilityIcon />
-                                  ) : (
-                                    <VisibilityOffIcon />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Field
-                          as={TextField}
-                          variant="outlined"
-                          fullWidth
-                          type={showConfirmPassword ? "text" : "password"}
-                          id="confirmPassword"
-                          label="Confirme a senha"
-                          name="confirmPassword"
-                          error={
-                            touched.confirmPassword &&
-                            Boolean(errors.confirmPassword)
-                          }
-                          helperText={
-                            touched.confirmPassword &&
-                            errors.confirmPassword
-                          }
-                          autoComplete="off"
-                          required
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={toggleConfirmPasswordVisibility}
-                                >
-                                  {showConfirmPassword ? (
-                                    <VisibilityIcon />
-                                  ) : (
-                                    <VisibilityOffIcon />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Grid>
-                    </>
-                  )}
                 </Grid>
-                {showResetPasswordButton ? (
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                  >
-                    Redefinir Senha
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                  >
-                    Enviar Email
-                  </Button>
-                )}
-                <Grid container justifyContent="flex-end">
+                <Button
+                  type="submit"
+                  fullWidth
+                  disabled={loading}
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Enviar Email
+                </Button>
+
+                <Grid container justifyContent="flex-end" spacing={2}>
+                  <Grid item>
+                    {emailSuccess && (
+                      <Typography align="left">
+                        Um link de recuperação de senha foi enviado para o seu
+                        email!
+                      </Typography>
+                    )}
+                  </Grid>
                   <Grid item>
                     <Link
                       href="#"

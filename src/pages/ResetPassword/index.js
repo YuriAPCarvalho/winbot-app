@@ -17,6 +17,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import Skeleton from "@mui/material/Skeleton";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
 import moment from "moment";
@@ -77,7 +78,7 @@ const ResetPassword = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -107,13 +108,16 @@ const ResetPassword = () => {
     // Estado para mensagens de erro
 
     if (newPassword === confirmPassword) {
+      setLoading(true);
       newPassword = await bcrypt.hash(newPassword, 8);
       try {
-        await api.post(`${process.env.REACT_APP_BACKEND_URL}/resetpasswords`, {
-          email,
-          tokenSenha,
-          newPassword,
-        });
+        await api
+          .post(`${process.env.REACT_APP_BACKEND_URL}/resetpasswords`, {
+            email,
+            tokenSenha,
+            newPassword,
+          })
+          .finally(() => setLoading(false));
         setError(""); // Limpe o erro se não houver erro
         toast.success(i18n.t("Senha redefinida com sucesso."));
         history.push("/login");
@@ -237,16 +241,20 @@ const ResetPassword = () => {
                     </Grid>
                   </>
                 </Grid>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  className={classes.submit}
-                >
-                  Redefinir Senha
-                </Button>
+                {loading ? (
+                  <Skeleton animation={"wave"} width={336} height={50} />
+                ) : (
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    className={classes.submit}
+                  >
+                    Redefinir Senha
+                  </Button>
+                )}
 
                 <Grid container justifyContent="flex-end">
                   <Grid item>

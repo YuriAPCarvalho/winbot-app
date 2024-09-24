@@ -16,6 +16,7 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import Skeleton from "@mui/material/Skeleton";
 import Container from "@material-ui/core/Container";
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n";
@@ -144,16 +145,20 @@ const ForgetPassword = () => {
                     />
                   </Grid>
                 </Grid>
-                <Button
-                  type="submit"
-                  fullWidth
-                  disabled={loading}
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  Enviar Email
-                </Button>
+                {loading ? (
+                  <Skeleton animation={"wave"} width={336} height={50} />
+                ) : (
+                  <Button
+                    type="submit"
+                    fullWidth
+                    disabled={loading}
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                  >
+                    Enviar Email
+                  </Button>
+                )}
 
                 <Grid container justifyContent="flex-end" spacing={2}>
                   <Grid item>

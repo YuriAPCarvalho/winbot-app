@@ -25,7 +25,7 @@ const messages = {
         },
         buttons: {
           submit: "Entrar",
-          register: "Cadastra-se agora!",
+          register: "Testar 7 dias grátis ",
           forget: "Esqueci minha senha",
         },
       },

@@ -30,5 +30,6 @@ export function useDate() {
     dateToClient,
     datetimeToClient,
     dateToDatabase,
+    dateIsBeforeToday,
   };
 }

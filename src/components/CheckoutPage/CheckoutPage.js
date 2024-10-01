@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Stepper,
   Step,
@@ -6,19 +6,20 @@ import {
   Button,
   Typography,
   CircularProgress,
+  Box,
 } from "@material-ui/core";
 import { Formik, Form } from "formik";
-
+import { ArrowForward, CreditCard, ArrowBack } from "@material-ui/icons";
 import AddressForm from "./Forms/AddressForm";
 import PaymentForm from "./Forms/PaymentForm";
 import ReviewOrder from "./ReviewOrder";
 import CheckoutSuccess from "./CheckoutSuccess";
+import { makeStyles } from "@material-ui/core/styles";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/Auth/AuthContext";
-
 
 import validationSchema from "./FormModel/validationSchema";
 import checkoutFormModel from "./FormModel/checkoutFormModel";
@@ -27,13 +28,10 @@ import formInitialValues from "./FormModel/formInitialValues";
 import useStyles from "./styles";
 import Invoices from "../../pages/Financeiro";
 
-
 export default function CheckoutPage(props) {
   const steps = ["Dados", "Personalizar", "Revisar"];
   const { formId, formField } = checkoutFormModel;
-  
-  
-  
+
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(1);
   const [datePayment, setDatePayment] = useState(null);
@@ -42,27 +40,38 @@ export default function CheckoutPage(props) {
   const isLastStep = activeStep === steps.length - 1;
   const { user } = useContext(AuthContext);
 
-function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
+  useEffect(() => {
+    console.log(user);
+    console.log(formInitialValues);
+  }, []);
 
-  switch (step) {
-    case 0:
-      return <AddressForm formField={formField} values={values} setFieldValue={setFieldValue}  />;
-    case 1:
-      return <PaymentForm 
-      formField={formField} 
-      setFieldValue={setFieldValue} 
-      setActiveStep={setActiveStep} 
-      activeStep={step} 
-      invoiceId={invoiceId}
-      values={values}
-      />;
-    case 2:
-      return <ReviewOrder />;
-    default:
-      return <div>Not Found</div>;
+  function _renderStepContent(step, setFieldValue, setActiveStep, values) {
+    switch (step) {
+      case 0:
+        return (
+          <AddressForm
+            formField={formField}
+            values={values}
+            setFieldValue={setFieldValue}
+          />
+        );
+      case 1:
+        return (
+          <PaymentForm
+            formField={formField}
+            setFieldValue={setFieldValue}
+            setActiveStep={setActiveStep}
+            activeStep={step}
+            invoiceId={invoiceId}
+            values={values}
+          />
+        );
+      case 2:
+        return <ReviewOrder />;
+      default:
+        return <div>Not Found</div>;
+    }
   }
-}
-
 
   async function _submitForm(values, actions) {
     try {
@@ -83,14 +92,16 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
         price: plan.price,
         users: plan.users,
         connections: plan.connections,
-        invoiceId: invoiceId
-      }
+        invoiceId: invoiceId,
+      };
 
       const { data } = await api.post("/subscription", newValues);
-      setDatePayment(data)
+      setDatePayment(data);
       actions.setSubmitting(false);
       setActiveStep(activeStep + 1);
-      toast.success("Assinatura realizada com sucesso!, aguardando a realização do pagamento");
+      toast.success(
+        "Assinatura realizada com sucesso!, aguardando a realização do pagamento"
+      );
     } catch (err) {
       toastError(err);
     }
@@ -112,9 +123,18 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
 
   return (
     <React.Fragment>
-      <Typography component="h1" variant="h4" align="center">
-        Falta pouco!
-      </Typography>
+      <Box className={classes.pixButton}>
+        <Button onClick={() => props.selectPlan(null)}>
+          <ArrowBack></ArrowBack>
+          <Typography>Planos</Typography>
+        </Button>
+        <Button onClick={() => props.methodPix(false)}>
+          <CreditCard />
+          <Typography>Pagar com cartão</Typography>
+          <ArrowForward></ArrowForward>
+        </Button>
+      </Box>
+
       <Stepper activeStep={activeStep} className={classes.stepper}>
         {steps.map((label) => (
           <Step key={label}>
@@ -128,15 +148,20 @@ function _renderStepContent(step, setFieldValue, setActiveStep, values ) {
         ) : (
           <Formik
             initialValues={{
-              ...user, 
-              ...formInitialValues
+              ...user,
+              ...formInitialValues,
             }}
             validationSchema={currentValidationSchema}
             onSubmit={_handleSubmit}
           >
             {({ isSubmitting, setFieldValue, values }) => (
               <Form id={formId}>
-                {_renderStepContent(activeStep, setFieldValue, setActiveStep, values)}
+                {_renderStepContent(
+                  activeStep,
+                  setFieldValue,
+                  setActiveStep,
+                  values
+                )}
 
                 <div className={classes.buttons}>
                   {activeStep !== 1 && (

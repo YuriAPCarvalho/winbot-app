@@ -324,7 +324,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
 
   const messageToDisplay = (dueDate) => {
     let formatDate = dateToClient(dueDate);
-    if (dateIsBeforeToday(dueDate)) {
+    if (!dateIsBeforeToday(dueDate)) {
       return `(Assinatura vencida no dia ${formatDate})`;
     } else {
       return `(Ativo até ${formatDate})`;

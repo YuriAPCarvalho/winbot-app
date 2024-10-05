@@ -2,9 +2,11 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+const env = require("dotenv").config();
+
 app.use(express.static(path.join(__dirname, "build")));
 app.get("/*", function (req, res) {
-	res.sendFile(path.join(__dirname, "build", "index.html"));
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
-app.listen(3000);
-
+app.listen(env.REACT_APP_PORT);
+console.log("Server is running on port " + env.REACT_APP_PORT);

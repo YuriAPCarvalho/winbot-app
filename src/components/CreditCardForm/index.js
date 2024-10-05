@@ -32,6 +32,7 @@ import api from "../../services/api";
 import useAuth from "../../hooks/useAuth.js";
 import useCompanies from "../../hooks/useCompanies";
 import { AuthContext } from "../../context/Auth/AuthContext.js";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.js";
 
 // SVG ilustrativo do cartão de crédito
 const CreditCardIllustration = ({ cardNumber, cardName, cardDate, brand }) => (
@@ -123,6 +124,8 @@ const CreditCardForm = (props) => {
   const { handleLogout } = useContext(AuthContext);
   const [chargeInfo, setChargeInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const history = useHistory();
+
   const [brand, setBrand] = useState();
 
   useEffect(() => {}, []);
@@ -179,7 +182,7 @@ const CreditCardForm = (props) => {
     })
       .then((res) => {
         toast.success("Operação efetuada com sucesso!");
-        handleLogout();
+        history.push("/");
         setLoading(false);
       })
       .catch((err) => {

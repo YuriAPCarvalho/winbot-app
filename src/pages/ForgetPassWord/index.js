@@ -83,16 +83,18 @@ const ForgetPassword = () => {
       );
       console.log("API Response:", response.data);
 
-      if (response.data.status === 404) {
-        toast.error("Email não encontrado");
-        setLoading(false);
-      } else {
+      if (response.data.status === 200) {
         setLoading(false);
 
         setEmailSuccess(true);
         toast.success(i18n.t("Email enviado com sucesso!"));
+      } else {
+        toast.error("Email não encontrado");
+        setLoading(false);
       }
     } catch (err) {
+      setLoading(false);
+
       console.log("API Error:", err);
       toastError(err);
     }
@@ -169,15 +171,32 @@ const ForgetPassword = () => {
                       </Typography>
                     )}
                   </Grid>
-                  <Grid item>
-                    <Link
-                      href="#"
-                      variant="body2"
-                      component={RouterLink}
-                      to="/signup"
+                  <Grid item style={{ width: "100%" }}>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
                     >
-                      {i18n.t("Não tem uma conta? Cadastre-se!")}
-                    </Link>
+                      <Link
+                        href="#"
+                        variant="body2"
+                        component={RouterLink}
+                        to="/login"
+                      >
+                        Voltar
+                      </Link>
+                      <Link
+                        href="#"
+                        variant="body2"
+                        component={RouterLink}
+                        to="/signup"
+                      >
+                        {i18n.t("Não tem uma conta? Cadastre-se!")}
+                      </Link>
+                    </Box>
                   </Grid>
                 </Grid>
                 {error && (

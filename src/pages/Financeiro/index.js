@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import { toast } from "react-toastify";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -15,29 +15,22 @@ import {
   Box,
 } from "@material-ui/core";
 
-import IconButton from "@material-ui/core/IconButton";
-import SearchIcon from "@material-ui/icons/Search";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import PlanList from "../../components/PlanList";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import EditIcon from "@material-ui/icons/Edit";
 
 import MainContainer from "../../components/MainContainer";
 import MainHeader from "../../components/MainHeader";
-import MainHeaderButtonsWrapper from "../../components/MainHeaderButtonsWrapper";
 import Title from "../../components/Title";
 import SubscriptionModal from "../../components/SubscriptionModal";
 import api from "../../services/api";
-import { i18n } from "../../translate/i18n";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
-import UserModal from "../../components/UserModal";
-import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import CreditCardForm from "../../components/CreditCardForm";
 
 import moment from "moment";
 import CheckoutPage from "../../components/CheckoutPage";
+import ListActiveCharges from "../../components/ListActiveCharges";
+import useChargeInfo from "../../hooks/useChargeInfo";
+import { AuthContext } from "../../context/Auth/AuthContext";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_INVOICES") {
@@ -111,6 +104,9 @@ const Invoices = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState();
   const [methodPix, setMethodPix] = useState(false);
+  const [charges, setCharges] = useState([]);
+  const { findChargesByCompany } = useChargeInfo();
+  const { user } = useContext(AuthContext);
 
   const handleOpenContactModal = (invoices) => {
     setStoragePlans(invoices);
@@ -122,6 +118,14 @@ const Invoices = () => {
     setSelectedContactId(null);
     setContactModalOpen(false);
   };
+
+  useEffect(() => {
+    findChargesByCompany(user?.companyId).then((res) => {
+      setCharges(res);
+      console.log(res);
+    });
+  }, []);
+
   useEffect(() => {
     dispatch({ type: "RESET" });
     setPageNumber(1);
@@ -217,6 +221,8 @@ const Invoices = () => {
               methodPix={setMethodPix}
               selectPlan={setSelectedPlan}
             />
+          ) : charges?.length > 0 ? (
+            <ListActiveCharges charges={charges} />
           ) : (
             <CreditCardForm
               selectPlan={setSelectedPlan}

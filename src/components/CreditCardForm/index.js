@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import PixSVG from "../../assets/pixSvg.js";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
+import cardBrands from "../../helpers/cardBrands.js";
 import {
   Box,
   TextField,
@@ -21,6 +23,7 @@ import {
   Security,
   ArrowBack,
   Pix,
+  CardGiftcardOutlined,
 } from "@material-ui/icons";
 import SvgIcon from "@mui/material/SvgIcon";
 import useCheckout from "../../hooks/useCheckout";
@@ -28,28 +31,34 @@ import ChargeForm from "../ChargeForm";
 import api from "../../services/api";
 import useAuth from "../../hooks/useAuth.js";
 import useCompanies from "../../hooks/useCompanies";
+import { AuthContext } from "../../context/Auth/AuthContext.js";
 
 // SVG ilustrativo do cartão de crédito
-const CreditCardIllustration = ({ cardNumber, cardName, cardExpiry }) => (
+const CreditCardIllustration = ({ cardNumber, cardName, cardDate, brand }) => (
   <SvgIcon viewBox="0 0 500 300" sx={{ width: "100%", height: "auto" }}>
     <rect x="0" y="0" width="500" height="300" rx="20" ry="20" fill="#000000" />
     <text x="30" y="50" fill="#fff" fontSize="24" fontWeight="bold">
-      Fí Bank
+      Bank
     </text>
     <text x="30" y="150" fill="#fff" fontSize="22">
       {formatNumCard(cardNumber) || "**** **** **** ****"}
     </text>
     <text x="30" y="200" fill="#fff" fontSize="18">
-      {cardName || "Seu Nome Aqui"}
+      {/* {cardName || "Seu Nome Aqui"} */}
     </text>
     <text x="380" y="200" fill="#fff" fontSize="18">
-      {cardExpiry || "MM/AA"}
+      {/* {cardDate || "MM/AA"} */}
     </text>
-    <rect x="30" y="230" width="440" height="30" fill="#fff" rx="5" ry="5" />
+    {brand != "" && (
+      <image href={brand} x="340" y="20" width="200" height="50" />
+    )}
+
+    <rect x="80" y="230" width="200" height="30" fill="#fff" rx="5" ry="5" />
   </SvgIcon>
 );
 
 function formatNumCard(cardNumber) {
+  cardNumber = cardNumber?.replace(/\s+/g, "");
   if (cardNumber) {
     return `${cardNumber.substring(0, 4)} ${cardNumber.substring(
       4,
@@ -60,16 +69,14 @@ function formatNumCard(cardNumber) {
 
 // Validação com Yup
 const validationSchema = Yup.object({
-  cardNumber: Yup.string()
-    .required("Número do cartão é obrigatório")
-    .matches(/^[0-9]{16}$/, "Deve ter 16 dígitos"),
+  cardNumber: Yup.string().required("Número do cartão é obrigatório"),
   cardName: Yup.string().required("Nome no cartão é obrigatório"),
-  cardExpiry: Yup.string()
+  cardDate: Yup.string()
     .required("Data de validade é obrigatória")
-    .matches(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/, "Data inválida"),
+    .matches(/^(0[1-9]|1[0-2])\/?([0-9]{4})$/, "Data inválida"),
   cardCvv: Yup.string()
     .required("CVV é obrigatório")
-    .matches(/^[0-9]{3,4}$/, "Deve ter 3 ou 4 dígitos"),
+    .matches(/^[0-9]{3,6}$/, "Deve ter 3 ou 4 dígitos"),
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -112,26 +119,73 @@ const useStyles = makeStyles((theme) => ({
 
 const CreditCardForm = (props) => {
   const classes = useStyles();
-  const { generatePaymentToken } = useCheckout();
+  const { generatePaymentToken, identifyBrand, subscribe } = useCheckout();
+  const { handleLogout } = useContext(AuthContext);
   const [chargeInfo, setChargeInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [brand, setBrand] = useState();
 
-  const [cardInfo, setCardInfo] = useState({
-    cardNumber: "",
-    cardName: "",
-    cardExpiry: "",
-  });
+  useEffect(() => {}, []);
 
-  const handleCardInputChange = (field, value) => {
-    setCardInfo((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
+  async function showBrand(cardNumber) {
+    setLoading(true);
+    identifyBrand(cardNumber)
+      .then((res) => {
+        if (res) {
+          setChargeInfo({
+            ...chargeInfo,
+            ...{ cardFlag: res, cardNumber: cardNumber },
+          });
+          setBrand(cardBrands(res));
+        }
+      })
+      .finally(() => setLoading(false));
+  }
+
+  const onSubmit = async (values) => {
+    setLoading(true);
+
+    var expirationMonth = values.cardDate.split("/")[0];
+
+    var expirationYear = values.cardDate.split("/")[1];
+
+    values = {
+      ...values,
+      ...{ expirationMonth, expirationYear, brand: chargeInfo?.cardFlag },
+    };
+
+    var { payment_token } = await generatePaymentToken(values);
+
+    setChargeInfo({
+      ...chargeInfo,
+      ...{
+        payment_token,
+        planID: props.plan?.bankPlanID,
+        planName: props.plan?.name,
+        planValue: props.plan?.value,
+        cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
+      },
+    });
+
+    await subscribe({
+      ...chargeInfo,
+      ...{
+        payment_token,
+        planID: props.plan?.bankPlanID,
+        planName: props.plan?.name,
+        planValue: props.plan?.value,
+        cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
+      },
+    })
+      .then((res) => {
+        toast.success("Operação efetuada com sucesso!");
+        handleLogout();
+        setLoading(false);
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
   };
-
-  useEffect(() => {
-    Promise.all([generatePaymentToken()]);
-  }, []);
-
   return (
     <Box
       sx={{ padding: 4, maxWidth: 1000, margin: "0 auto" }}
@@ -155,29 +209,29 @@ const CreditCardForm = (props) => {
         <Card className={classes.cardPreview} elevation={0}>
           <CardContent>
             <CreditCardIllustration
-              cardNumber={cardInfo.cardNumber}
-              cardName={cardInfo.cardName}
-              cardExpiry={cardInfo.cardExpiry}
+              cardNumber={chargeInfo?.cardNumber}
+              cardName={chargeInfo?.cardName}
+              cardDate={chargeInfo?.cardDate}
+              brand={brand}
             />
             <Formik
               initialValues={{
                 cardNumber: "",
                 cardName: "",
-                cardExpiry: "",
+                cardDate: "",
                 cardCvv: "",
               }}
               validationSchema={validationSchema}
-              onSubmit={(values, { setSubmitting }) => {
-                setSubmitting(true);
-                console.log("Enviando dados:", values);
-                setTimeout(() => {
-                  setSubmitting(false);
-                  alert("Pagamento realizado com sucesso!");
-                }, 2000);
-              }}
+              onSubmit={onSubmit}
             >
-              {({ isSubmitting, handleChange, handleBlur }) => (
-                <Form noValidate className={classes.formCard}>
+              {({
+                isSubmitting,
+                handleChange,
+                handleBlur,
+                errors,
+                touched,
+              }) => (
+                <Form className={classes.formCard}>
                   <Grid container spacing={3}>
                     {/* Número do Cartão */}
                     <Grid item xs={12}>
@@ -186,71 +240,55 @@ const CreditCardForm = (props) => {
                         as={TextField}
                         label="Número do Cartão"
                         fullWidth
-                        onChange={(e) => {
-                          handleChange(e);
-                          handleCardInputChange("cardNumber", e.target.value);
-                        }}
-                        onBlur={handleBlur}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <CreditCard />
-                            </InputAdornment>
-                          ),
+                        disabled={chargeInfo == null}
+                        onBlur={(e) => {
+                          showBrand(e.target.value);
                         }}
                         helperText={<ErrorMessage name="cardNumber" />}
-                        error={<ErrorMessage name="cardNumber" />}
+                        error={touched.cardNumber && Boolean(errors.cardNumber)}
                       />
                     </Grid>
 
-                    {/* Nome no Cartão */}
                     <Grid item xs={12}>
                       <Field
                         name="cardName"
                         as={TextField}
                         label="Nome no Cartão"
                         fullWidth
-                        onChange={(e) => {
-                          handleChange(e);
-                          handleCardInputChange("cardName", e.target.value);
-                        }}
+                        disabled={chargeInfo == null}
                         onBlur={handleBlur}
                         helperText={<ErrorMessage name="cardName" />}
-                        error={<ErrorMessage name="cardName" />}
+                        error={touched.cardName && Boolean(errors.cardName)}
                       />
                     </Grid>
 
-                    {/* Data de Expiração */}
                     <Grid item xs={6}>
                       <Field
-                        name="cardExpiry"
+                        name="cardDate"
                         as={TextField}
-                        label="Data de Expiração (MM/AA)"
+                        label="Data de Expiração (MM/AAAA)"
+                        placeholder="00/0000"
                         fullWidth
-                        onChange={(e) => {
-                          handleChange(e);
-                          handleCardInputChange("cardExpiry", e.target.value);
-                        }}
+                        disabled={chargeInfo == null}
                         onBlur={handleBlur}
                         helperText={<ErrorMessage name="cardExpiry" />}
-                        error={<ErrorMessage name="cardExpiry" />}
+                        error={touched.cardDate && Boolean(errors.cardDate)}
                       />
                     </Grid>
 
-                    {/* CVV */}
                     <Grid item xs={6}>
                       <Field
                         name="cardCvv"
                         as={TextField}
                         label="CVV"
                         fullWidth
+                        disabled={chargeInfo == null}
                         onBlur={handleBlur}
                         helperText={<ErrorMessage name="cardCvv" />}
-                        error={<ErrorMessage name="cardCvv" />}
+                        error={touched.cardCvv && Boolean(errors.cardCvv)}
                       />
                     </Grid>
 
-                    {/* Botão de Submissão */}
                     <Grid item xs={12}>
                       <Button
                         sx={{ backgroundColor: "black" }}
@@ -260,7 +298,7 @@ const CreditCardForm = (props) => {
                         fullWidth
                         disabled={chargeInfo == null}
                       >
-                        {isSubmitting ? "Processando..." : "Pagar"}
+                        {loading ? "Processando..." : "Pagar"}
                       </Button>
                     </Grid>
                   </Grid>

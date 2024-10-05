@@ -1,4 +1,7 @@
 import EfiPay from "payment-token-efi";
+import toastError from "../../errors/toastError";
+import { toast } from "react-toastify";
+import api from "../../services/api";
 
 const useCheckout = () => {
   async function identifyBrand(cardNumber) {
@@ -8,7 +11,10 @@ const useCheckout = () => {
       ).verifyCardBrand();
 
       console.log("Bandeira: ", brand);
+
+      return brand;
     } catch (error) {
+      toastError("Bandeira não identificada!");
       console.log("Código: ", error.code);
       console.log("Nome: ", error.error);
       console.log("Mensagem: ", error.error_description);
@@ -33,18 +39,25 @@ const useCheckout = () => {
     }
   }
 
-  async function generatePaymentToken() {
+  async function generatePaymentToken({
+    cardNumber,
+    cardName,
+    expirationMonth,
+    expirationYear,
+    cardCvv,
+    brand,
+  }) {
     try {
       const result = await EfiPay.CreditCard.setAccount(
         "3add04ec035570accb5cb720b299406e"
       )
         .setEnvironment("sandbox") // 'production' or 'sandbox'
         .setCreditCardData({
-          brand: "mastercard",
-          number: "5502091689523612",
-          cvv: "630",
-          expirationMonth: "09",
-          expirationYear: "2032",
+          brand,
+          number: cardNumber,
+          cvv: cardCvv,
+          expirationMonth,
+          expirationYear,
           reuse: false,
         })
         .getPaymentToken();
@@ -54,17 +67,27 @@ const useCheckout = () => {
 
       console.log("payment_token", payment_token);
       console.log("card_mask", card_mask);
+
+      return { payment_token, card_mask };
     } catch (error) {
-      console.log("Código: ", error.code);
-      console.log("Nome: ", error.error);
-      console.log("Mensagem: ", error.error_description);
+      toast.error(error.error_description);
     }
   }
+
+  const subscribe = async (data) => {
+    const { data: responseData } = await api.request({
+      url: "/cardsubscription",
+      method: "POST",
+      data,
+    });
+    return responseData;
+  };
 
   return {
     identifyBrand,
     listInstallments,
     generatePaymentToken,
+    subscribe,
   };
 };
 

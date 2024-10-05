@@ -53,6 +53,7 @@ import {
 import usePlans from "../hooks/usePlans";
 import Typography from "@material-ui/core/Typography";
 import useVersion from "../hooks/useVersion";
+import useCompanies from "../hooks/useCompanies";
 
 const useStyles = makeStyles((theme) => ({
   ListSubheader: {
@@ -66,10 +67,13 @@ function ListItemLink(props) {
   const { user } = useContext(AuthContext);
   const { dateIsBeforeToday } = useDate();
   const { icon, primary, to, className } = props;
-  let blockFeatures;
+  const { find } = useCompanies();
+  const [blockFeatures, setBlockFeatures] = useState();
 
   useEffect(() => {
-    blockFeatures = dateIsBeforeToday(user?.company?.dueDate);
+    find(user?.company?.id).then((resp) => {
+      setBlockFeatures(dateIsBeforeToday(resp?.dueDate));
+    });
   }, [user]);
   const renderLink = React.useMemo(
     () =>
@@ -82,7 +86,7 @@ function ListItemLink(props) {
   return (
     <li>
       <ListItem
-        disabled={!primary.includes("Financeiro") && !blockFeatures}
+        disabled={primary.includes("Financeiro") ? false : !blockFeatures}
         button
         dense
         component={renderLink}

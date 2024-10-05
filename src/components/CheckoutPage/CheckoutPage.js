@@ -40,10 +40,7 @@ export default function CheckoutPage(props) {
   const isLastStep = activeStep === steps.length - 1;
   const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    console.log(user);
-    console.log(formInitialValues);
-  }, []);
+  useEffect(() => {}, []);
 
   function _renderStepContent(step, setFieldValue, setActiveStep, values) {
     switch (step) {

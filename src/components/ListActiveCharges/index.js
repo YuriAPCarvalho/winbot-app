@@ -19,6 +19,8 @@ const ListActiveCharges = (props) => {
                 justifyContent: "space-between",
               }}
             >
+              <RadioButtonChecked />
+
               <img
                 src={cardBrands(props.charges[0].cardFlag)}
                 style={{ height: 20 }}
@@ -29,7 +31,6 @@ const ListActiveCharges = (props) => {
                   .padStart(props?.charges[0]?.cardNumber?.length, "*")}
               </Typography>
               <Typography color="textPrimary">Ativo</Typography>
-              <RadioButtonChecked />
               <Button>
                 <Typography color="error">Cancelar</Typography>
               </Button>

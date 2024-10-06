@@ -70,7 +70,7 @@ const ChargeForm = (props) => {
     Promise.all([
       getCurrentUserInfo().then((res) => {}),
 
-      find(user?.companyId).then(async (res) => {
+      find(user?.companyId).then((res) => {
         setInitialValues({
           ...initialValues,
           ...{
@@ -81,8 +81,10 @@ const ChargeForm = (props) => {
           },
         });
 
-        await findChargesByCompany(res.id)
+        findChargesByCompany(res.id)
           .then((res) => {
+            console.log("data charger" + res);
+
             if (res.length > 0) {
               if (res.find((c) => c.cardBumber != null)) {
                 setHasActiveCharges(true);
@@ -97,6 +99,7 @@ const ChargeForm = (props) => {
             } else {
               setHasActiveCharges(false);
             }
+            setLoading(false);
 
             setCompanyCharges(res);
           })

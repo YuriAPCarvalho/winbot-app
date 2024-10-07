@@ -5,12 +5,13 @@ const app = express();
 const env = require("dotenv").config();
 app.use(
   cors({
-    credentials: true,
-    origin: "http://154.38.180.13:3001",
+    credentials: false,
+    origin: "*",
   })
 );
 
 app.use(express.static(path.join(__dirname, "build")));
+
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });

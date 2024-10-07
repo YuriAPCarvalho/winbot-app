@@ -399,13 +399,12 @@ const LoggedInLayout = ({ children, themeToggle }) => {
             user?.profile === "admin" &&
             user?.company?.dueDate ? (
               <>
-                Olá <b>{user.name}</b>, Bem vindo a <b>{user?.company?.name}</b>
-                ! {messageToDisplay(user?.company?.dueDate)}
+                Bem vindo a <b>{user?.company?.name}</b>!{" "}
+                {messageToDisplay(user?.company?.dueDate)}
               </>
             ) : (
               <>
-                Olá <b>{user.name}</b>, Bem vindo a <b>{user?.company?.name}</b>
-                !
+                Bem vindo a <b>{user?.company?.name}</b>!
               </>
             )}
           </Typography>

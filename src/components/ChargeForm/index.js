@@ -86,9 +86,7 @@ const ChargeForm = (props) => {
             console.log("data charger" + res);
 
             if (res.length > 0) {
-              if (res.find((c) => c.cardBumber != null)) {
-                setHasActiveCharges(true);
-              } else if (formikRef.current) {
+              if (formikRef.current) {
                 formikRef.current.setFieldValue("cpf", res[0]?.cpf);
                 formikRef.current.setFieldValue("birth", res[0]?.birth);
                 formikRef.current.setFieldValue("zipcode", res[0]?.zipcode);
@@ -154,151 +152,148 @@ const ChargeForm = (props) => {
 
   return (
     <Container maxWidth="sm">
-      {hasActiveCharges ? (
-        <ListActiveCharges charges={companyCharges} />
-      ) : (
-        <Box sx={{ mt: 5 }}>
-          <Typography variant="h4" gutterBottom>
-            {props?.plan?.name}
+      <Box sx={{ mt: 5 }}>
+        <Typography variant="h4" gutterBottom>
+          {props?.plan?.name}
+        </Typography>
+        <Typography variant="h4" fontWeight={12} gutterBottom>
+          R${props?.plan?.value},00/mês
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          Informe os dados da cobrança
+        </Typography>
+        <Formik
+          innerRef={formikRef}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+          initialValues={{
+            cpf: "",
+            birth: "",
+            zipcode: "",
+            number: "",
+          }}
+        >
+          {({
+            values,
+            handleChange,
+            setFieldValue,
+            setValues,
+            errors,
+            touched,
+            setSubmitting,
+          }) => (
+            <Form>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="CPF"
+                    name="cpf"
+                    value={values.cpf}
+                    onChange={handleChange}
+                    error={touched.cpf && Boolean(errors.cpf)}
+                    helperText={touched.cpf && errors.cpf}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Data de Nascimento"
+                    name="birth"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={values.birth}
+                    onChange={handleChange}
+                    error={touched.birth && Boolean(errors.birth)}
+                    helperText={touched.birth && errors.birth}
+                  />
+                </Grid>
+
+                <Grid item xs={8}>
+                  <TextField
+                    fullWidth
+                    label="CEP"
+                    name="zipcode"
+                    value={values.zipcode}
+                    onChange={(e) => {
+                      handleChange(e);
+                      handleCEPChange(e, setFieldValue);
+                    }}
+                    error={touched.zipcode && Boolean(errors.zipcode)}
+                    helperText={touched.zipcode && errors.zipcode}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    label="Numero"
+                    name="number"
+                    value={values.number}
+                    onChange={handleChange}
+                    error={touched.number && Boolean(errors.number)}
+                    helperText={touched.number && errors.number}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  {loading ? (
+                    <CircularProgress />
+                  ) : (
+                    <Button
+                      sx={{ backgroundColor: "black" }}
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      fullWidth
+                    >
+                      SALVAR
+                    </Button>
+                  )}
+                </Grid>
+              </Grid>
+            </Form>
+          )}
+        </Formik>
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Typography variant="body2" color="textSecondary">
+            Transação segura garantida
           </Typography>
-          <Typography variant="h4" fontWeight={12} gutterBottom>
-            R${props?.plan?.value},00/mês
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Informe os dados da cobrança
-          </Typography>
-          <Formik
-            innerRef={formikRef}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-            initialValues={{
-              cpf: "",
-              birth: "",
-              zipcode: "",
-              number: "",
+
+          <Box
+            className={classes.footer}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 1,
             }}
           >
-            {({
-              values,
-              handleChange,
-              setFieldValue,
-              setValues,
-              errors,
-              touched,
-              setSubmitting,
-            }) => (
-              <Form>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="CPF"
-                      name="cpf"
-                      value={values.cpf}
-                      onChange={handleChange}
-                      error={touched.cpf && Boolean(errors.cpf)}
-                      helperText={touched.cpf && errors.cpf}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Data de Nascimento"
-                      name="birth"
-                      type="date"
-                      InputLabelProps={{ shrink: true }}
-                      value={values.birth}
-                      onChange={handleChange}
-                      error={touched.birth && Boolean(errors.birth)}
-                      helperText={touched.birth && errors.birth}
-                    />
-                  </Grid>
-
-                  <Grid item xs={8}>
-                    <TextField
-                      fullWidth
-                      label="CEP"
-                      name="zipcode"
-                      value={values.zipcode}
-                      onChange={(e) => {
-                        handleChange(e);
-                        handleCEPChange(e, setFieldValue);
-                      }}
-                      error={touched.zipcode && Boolean(errors.zipcode)}
-                      helperText={touched.zipcode && errors.zipcode}
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      fullWidth
-                      label="Numero"
-                      name="number"
-                      value={values.number}
-                      onChange={handleChange}
-                      error={touched.number && Boolean(errors.number)}
-                      helperText={touched.number && errors.number}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    {loading ? (
-                      <CircularProgress />
-                    ) : (
-                      <Button
-                        sx={{ backgroundColor: "black" }}
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        fullWidth
-                      >
-                        SALVAR
-                      </Button>
-                    )}
-                  </Grid>
-                </Grid>
-              </Form>
-            )}
-          </Formik>
-          <Box sx={{ mt: 4, textAlign: "center" }}>
+            <Security color="primary" sx={{ fontSize: 30, mr: 1 }} />
             <Typography variant="body2" color="textSecondary">
-              Transação segura garantida
+              Pagamento protegido com criptografia SSL
             </Typography>
+          </Box>
 
-            <Box
-              className={classes.footer}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                mt: 1,
-              }}
-            >
-              <Security color="primary" sx={{ fontSize: 30, mr: 1 }} />
-              <Typography variant="body2" color="textSecondary">
-                Pagamento protegido com criptografia SSL
-              </Typography>
-            </Box>
-
-            {/* Bandeiras dos Cartões */}
-            <Box
-              sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}
-            >
-              {["mastercard", "visa", "amex", "elo"].map((brand) => {
-                return (
-                  <>
-                    <img
-                      src={cardBrands(brand)}
-                      alt="Elo"
-                      style={{ height: 20 }}
-                    />
-                  </>
-                );
-              })}
-            </Box>
+          {/* Bandeiras dos Cartões */}
+          <Box
+            sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}
+          >
+            {["mastercard", "visa", "amex", "elo"].map((brand, index) => {
+              return (
+                <>
+                  <img
+                    key={index}
+                    src={cardBrands(brand)}
+                    alt="Elo"
+                    style={{ height: 20 }}
+                  />
+                </>
+              );
+            })}
           </Box>
         </Box>
-      )}
+      </Box>
     </Container>
   );
 };

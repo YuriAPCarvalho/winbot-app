@@ -83,11 +83,21 @@ const useCheckout = () => {
     return responseData;
   };
 
+  const unsubscribe = async (data) => {
+    const { data: responseData } = await api.request({
+      url: "/cardunsubscription",
+      method: "POST",
+      data,
+    });
+    return responseData;
+  };
+
   return {
     identifyBrand,
     listInstallments,
     generatePaymentToken,
     subscribe,
+    unsubscribe,
   };
 };
 

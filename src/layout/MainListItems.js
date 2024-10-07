@@ -70,11 +70,13 @@ function ListItemLink(props) {
   const { find } = useCompanies();
   const [blockFeatures, setBlockFeatures] = useState();
 
+  useEffect(() => {}, [user]);
+
   useEffect(() => {
     find(user?.company?.id).then((resp) => {
       setBlockFeatures(dateIsBeforeToday(resp?.dueDate));
     });
-  }, [user]);
+  }, []);
   const renderLink = React.useMemo(
     () =>
       React.forwardRef((itemProps, ref) => (

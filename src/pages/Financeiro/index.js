@@ -184,6 +184,8 @@ const Invoices = () => {
     const status = record.status;
     if (status === "paid") {
       return "Pago";
+    } else if (status === "canceled") {
+      return "Cancelado";
     }
     if (dias < 0) {
       return "Vencido";
@@ -221,8 +223,8 @@ const Invoices = () => {
               methodPix={setMethodPix}
               selectPlan={setSelectedPlan}
             />
-          ) : charges?.length > 0 ? (
-            <ListActiveCharges charges={charges} />
+          ) : charges.some((c) => c.cardNumber != null) ? (
+            <ListActiveCharges selectPlan={setSelectedPlan} charges={charges} />
           ) : (
             <CreditCardForm
               selectPlan={setSelectedPlan}
@@ -255,7 +257,6 @@ const Invoices = () => {
                 <TableCell align="center">Valor</TableCell>
                 <TableCell align="center">Data Venc.</TableCell>
                 <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Ação</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -275,27 +276,6 @@ const Invoices = () => {
                     </TableCell>
                     <TableCell style={{ fontWeight: "bold" }} align="center">
                       {rowStatus(invoices)}
-                    </TableCell>
-                    <TableCell align="center">
-                      {rowStatus(invoices) !== "Pago" ? (
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => handleOpenContactModal(invoices)}
-                        >
-                          PAGAR
-                        </Button>
-                      ) : (
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          /* color="secondary"
-                        disabled */
-                        >
-                          PAGO
-                        </Button>
-                      )}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -9,10 +9,10 @@ docker rm hml-winbot-app
 docker rmi hml-winbot-app
 
 # Atualizar o repositÃ³rio
-git pull
+git pull origin staging
 
 # Construir a nova imagem
-docker build -t image/hml-winbot-app .
+docker build --no-cache -t image/hml-winbot-app .
 
 # Executar o novo container
 docker run -d --env-file .env -p 3001:3001 -e PORT=3001 --name hml-winbot-app image/hml-winbot-app

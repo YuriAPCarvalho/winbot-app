@@ -3,8 +3,12 @@ const path = require("path");
 const cors = require("cors");
 const app = express();
 const env = require("dotenv").config();
-
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://154.38.180.13:3001",
+  })
+);
 
 app.use(express.static(path.join(__dirname, "build")));
 app.get("/*", function (req, res) {

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import PixSVG from "../../assets/pixSvg.js";
 import * as Yup from "yup";
-import { toast } from "react-toastify";
 import cardBrands from "../../helpers/cardBrands.js";
 import {
   Box,
@@ -34,6 +33,7 @@ import useCompanies from "../../hooks/useCompanies";
 import { AuthContext } from "../../context/Auth/AuthContext.js";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.js";
 import justNumber from "../../helpers/justNumbers.js";
+import { toast } from "react-toastify";
 
 // SVG ilustrativo do cartão de crédito
 const CreditCardIllustration = ({ cardNumber, cardName, cardDate, brand }) => (
@@ -197,6 +197,7 @@ const CreditCardForm = (props) => {
         planName: props.plan?.name,
         planValue: props.plan?.value,
         cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
+        name: values?.cardName,
       },
     })
       .then((res) => {
@@ -206,9 +207,11 @@ const CreditCardForm = (props) => {
         window.location.reload();
       })
       .catch((err) => {
+        console.log(err);
+
         setLoading(false);
 
-        toast.error(err);
+        toast.error("Não foi possível completar a operação, confira os dados!");
       });
   };
   return (
@@ -254,6 +257,7 @@ const CreditCardForm = (props) => {
                 handleChange,
                 setFieldValue,
                 handleBlur,
+                resetForm,
                 errors,
                 touched,
               }) => (

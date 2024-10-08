@@ -139,7 +139,7 @@ const PlanList = (props) => {
                   onClick={() => props.selectPlan(plan)}
                 >
                   {props.Invoice?.detail == plan.name
-                    ? "Pagar plano atual"
+                    ? "Plano atual"
                     : "Contratar Plano"}
                 </Button>
               </CardActions>

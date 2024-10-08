@@ -13,6 +13,30 @@ import useCheckout from "../../hooks/useCheckout";
 const ListActiveCharges = (props) => {
   const { user } = useContext(AuthContext);
   const { unsubscribe } = useCheckout();
+  const [isSubChange, setIsSubChange] = useState(false);
+
+  useEffect(() => {
+    if (props.Invoice?.detail != props?.plan?.name) {
+      setIsSubChange(true);
+    }
+  }, []);
+
+  function GetPrice() {
+    let planValue = props?.plan?.value;
+    let actualPlanValue = props.Invoice.value;
+    if (planValue > actualPlanValue) {
+      let avgPlanValue = planValue / 30;
+
+      let willPay =
+        Math.flloor(
+          (new Date(props.Invoice.dueDate) - new Date()) / (1000 * 60 * 60 * 24)
+        ) * avgPlanValue;
+
+      return willPay;
+    } else {
+      return planValue;
+    }
+  }
 
   async function onConfirm() {
     unsubscribe(user?.id)
@@ -58,10 +82,22 @@ const ListActiveCharges = (props) => {
               </Typography>
               <Typography color="textPrimary">Ativo</Typography>
               <Button>
-                <ConfirmUnsubscribe onConfirm={onConfirm}>
-                  Cancelar
-                </ConfirmUnsubscribe>
+                {!isSubChange && (
+                  <ConfirmUnsubscribe onConfirm={onConfirm}>
+                    Cancelar Plano
+                  </ConfirmUnsubscribe>
+                )}
               </Button>
+
+              {isSubChange && (
+                <div>
+                  <Typography>
+                    Efetuar mudança para {props?.plan?.detail}
+                  </Typography>
+                  <Typography>{GetPrice()}</Typography>
+                  <Button>Efetuar mudança de plano</Button>
+                </div>
+              )}
             </Box>
           </ListItem>
         </List>

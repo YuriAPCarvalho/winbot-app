@@ -114,7 +114,11 @@ const ChargeForm = (props) => {
     var cep = e.target.value;
 
     await handleZipcodeChange(cep).then((res) => {
-      setInitialValues({ ...initialValues, ...res });
+      if (res.state == "" || res.city == "") {
+        toast.error("CEP Inválido");
+      } else {
+        setInitialValues({ ...initialValues, ...res });
+      }
     });
   };
 

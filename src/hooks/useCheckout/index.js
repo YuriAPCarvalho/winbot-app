@@ -92,6 +92,15 @@ const useCheckout = () => {
     return responseData;
   };
 
+  const upgradeSubscription = async (data) => {
+    const { data: responseData } = await api.request({
+      url: "/upgradeSubscription",
+      method: "POST",
+      data,
+    });
+    return responseData;
+  };
+
   return {
     identifyBrand,
     listInstallments,

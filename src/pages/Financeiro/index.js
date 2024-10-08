@@ -224,7 +224,12 @@ const Invoices = () => {
               selectPlan={setSelectedPlan}
             />
           ) : charges.some((c) => c.cardNumber != null) ? (
-            <ListActiveCharges selectPlan={setSelectedPlan} charges={charges} />
+            <ListActiveCharges
+              selectPlan={setSelectedPlan}
+              charges={charges}
+              Invoice={invoices[invoices.length - 1]}
+              plan={selectedPlan}
+            />
           ) : (
             <CreditCardForm
               selectPlan={setSelectedPlan}

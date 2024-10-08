@@ -8,7 +8,7 @@ export const handleZipcodeChange = async (cep) => {
     try {
       const response = await axios.get(`http://viacep.com.br/ws/${cep}/json/`);
       if (response.data.erro) {
-        toast.error("Invalid Zipcode");
+        toast.error("CEP Inválido");
         return {
           city: "",
           state: "",

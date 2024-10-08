@@ -209,6 +209,7 @@ const ChargeForm = (props) => {
                     type="date"
                     InputLabelProps={{ shrink: true }}
                     value={values.birth}
+                    onChange={handleChange}
                     error={touched.birth && Boolean(errors.birth)}
                     helperText={touched.birth && errors.birth}
                   />

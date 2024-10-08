@@ -74,7 +74,7 @@ const ChargeForm = (props) => {
         setInitialValues({
           ...initialValues,
           ...{
-            companyID: res.id,
+            companyId: res.id,
             name: res.name,
             phone_number: res.phone,
             email: res.email,

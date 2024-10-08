@@ -58,7 +58,7 @@ const useCheckout = () => {
           cvv: cardCvv,
           expirationMonth,
           expirationYear,
-          reuse: false,
+          reuse: true,
         })
         .getPaymentToken();
 

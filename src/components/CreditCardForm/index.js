@@ -186,6 +186,8 @@ const CreditCardForm = (props) => {
         setLoading(false);
       })
       .catch((err) => {
+        setLoading(false);
+
         toast.error(err);
       });
   };

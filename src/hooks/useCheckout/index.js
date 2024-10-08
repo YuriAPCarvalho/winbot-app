@@ -51,14 +51,14 @@ const useCheckout = () => {
       const result = await EfiPay.CreditCard.setAccount(
         "3add04ec035570accb5cb720b299406e"
       )
-        .setEnvironment("sandbox") // 'production' or 'sandbox'
+        .setEnvironment("production") // 'production' or 'sandbox'
         .setCreditCardData({
           brand,
           number: cardNumber,
           cvv: cardCvv,
           expirationMonth,
           expirationYear,
-          reuse: false,
+          reuse: true,
         })
         .getPaymentToken();
 

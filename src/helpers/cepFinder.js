@@ -25,7 +25,6 @@ export const handleZipcodeChange = async (cep) => {
       }
     } catch (error) {
       toast.error("Erro ao encontrar CEP!");
-      alert("Error fetching address");
       return Promise.reject();
     }
   }

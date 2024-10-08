@@ -78,20 +78,17 @@ const ForgetPassword = () => {
     setLoading(true);
     const email = values.email;
     try {
-      const response = await api.post(
-        `${process.env.REACT_APP_BACKEND_URL}/forgetpassword/${email}`
-      );
-      console.log("API Response:", response.data);
-
-      if (response.data.status === 200) {
-        setLoading(false);
-
-        setEmailSuccess(true);
-        toast.success(i18n.t("Email enviado com sucesso!"));
-      } else {
-        toast.error("Email não encontrado");
-        setLoading(false);
-      }
+      await api
+        .post(`${process.env.REACT_APP_BACKEND_URL}/forgetpassword/${email}`)
+        .then((response) => {
+          setLoading(false);
+          setEmailSuccess(true);
+          toast.success(i18n.t("Email enviado com sucesso!"));
+        })
+        .catch((err) => {
+          toast.error("Email não encontrado");
+          setLoading(false);
+        });
     } catch (err) {
       setLoading(false);
 

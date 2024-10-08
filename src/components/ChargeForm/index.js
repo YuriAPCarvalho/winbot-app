@@ -22,6 +22,7 @@ import toastError from "../../errors/toastError.js";
 import ListActiveCharges from "../ListActiveCharges/index.js";
 import { handleZipcodeChange } from "../../helpers/cepFinder.js";
 import cardBrands from "../../helpers/cardBrands.js";
+import justNumber from "../../helpers/justNumbers.js";
 
 const validationSchema = Yup.object().shape({
   cpf: Yup.string()
@@ -109,7 +110,7 @@ const ChargeForm = (props) => {
     ]);
   }, []);
 
-  const handleCEPChange = async (e) => {
+  const handleCEPChange = async (e, setFieldValue) => {
     var cep = e.target.value;
 
     await handleZipcodeChange(cep).then((res) => {
@@ -187,10 +188,14 @@ const ChargeForm = (props) => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
+                    inputProps={{ maxLength: 11, pattern: "[0-9]*" }}
                     label="CPF"
                     name="cpf"
+                    max
                     value={values.cpf}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFieldValue("cpf", justNumber(e.target.value))
+                    }
                     error={touched.cpf && Boolean(errors.cpf)}
                     helperText={touched.cpf && errors.cpf}
                   />
@@ -204,7 +209,9 @@ const ChargeForm = (props) => {
                     type="date"
                     InputLabelProps={{ shrink: true }}
                     value={values.birth}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFieldValue("birth", justNumber(e.target.value))
+                    }
                     error={touched.birth && Boolean(errors.birth)}
                     helperText={touched.birth && errors.birth}
                   />
@@ -215,10 +222,14 @@ const ChargeForm = (props) => {
                     fullWidth
                     label="CEP"
                     name="zipcode"
+                    inputProps={{ maxLength: 8, pattern: "[0-9]*" }}
                     value={values.zipcode}
-                    onChange={(e) => {
-                      handleChange(e);
+                    onBlur={(e) => {
                       handleCEPChange(e, setFieldValue);
+                    }}
+                    onChange={(e) => {
+                      setFieldValue("zipcode", justNumber(e.target.value));
+                      handleChange(e);
                     }}
                     error={touched.zipcode && Boolean(errors.zipcode)}
                     helperText={touched.zipcode && errors.zipcode}
@@ -229,8 +240,10 @@ const ChargeForm = (props) => {
                     fullWidth
                     label="Numero"
                     name="number"
+                    onChange={(e) =>
+                      setFieldValue("number", justNumber(e.target.value))
+                    }
                     value={values.number}
-                    onChange={handleChange}
                     error={touched.number && Boolean(errors.number)}
                     helperText={touched.number && errors.number}
                   />

@@ -33,6 +33,7 @@ import useAuth from "../../hooks/useAuth.js";
 import useCompanies from "../../hooks/useCompanies";
 import { AuthContext } from "../../context/Auth/AuthContext.js";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.js";
+import justNumber from "../../helpers/justNumbers.js";
 
 // SVG ilustrativo do cartão de crédito
 const CreditCardIllustration = ({ cardNumber, cardName, cardDate, brand }) => (
@@ -145,6 +146,24 @@ const CreditCardForm = (props) => {
       .finally(() => setLoading(false));
   }
 
+  const formatExpiryDate = (value, setFieldValue) => {
+    const rawValue = value.replace(/\D/g, "");
+    if (rawValue.length <= 2) {
+      return setFieldValue("cardDate", rawValue);
+    }
+    if (rawValue.length <= 6) {
+      return setFieldValue(
+        "cardDate",
+        `${rawValue.slice(0, 2)}/${rawValue.slice(2)}`
+      );
+    }
+
+    return setFieldValue(
+      "cardDate",
+      `${rawValue.slice(0, 2)}/${rawValue.slice(2, 6)}`
+    );
+  };
+
   const onSubmit = async (values) => {
     setLoading(true);
 
@@ -182,8 +201,9 @@ const CreditCardForm = (props) => {
     })
       .then((res) => {
         toast.success("Operação efetuada com sucesso!");
-        history.push("/");
         setLoading(false);
+
+        window.location.reload();
       })
       .catch((err) => {
         setLoading(false);
@@ -232,6 +252,7 @@ const CreditCardForm = (props) => {
               {({
                 isSubmitting,
                 handleChange,
+                setFieldValue,
                 handleBlur,
                 errors,
                 touched,
@@ -244,8 +265,18 @@ const CreditCardForm = (props) => {
                         name="cardNumber"
                         as={TextField}
                         label="Número do Cartão"
+                        inputProps={{
+                          maxLength: 16,
+                          pattern: "[0-9]*",
+                        }}
                         fullWidth
                         disabled={chargeInfo == null}
+                        onChange={(e) =>
+                          setFieldValue(
+                            "cardNumber",
+                            justNumber(e.target.value)
+                          )
+                        }
                         onBlur={(e) => {
                           showBrand(e.target.value);
                         }}
@@ -275,6 +306,9 @@ const CreditCardForm = (props) => {
                         placeholder="00/0000"
                         fullWidth
                         disabled={chargeInfo == null}
+                        onChange={(e) =>
+                          formatExpiryDate(e.target.value, setFieldValue)
+                        }
                         onBlur={handleBlur}
                         helperText={<ErrorMessage name="cardExpiry" />}
                         error={touched.cardDate && Boolean(errors.cardDate)}
@@ -286,7 +320,11 @@ const CreditCardForm = (props) => {
                         name="cardCvv"
                         as={TextField}
                         label="CVV"
+                        inputProps={{ maxLength: 3, pattern: "[0-9]*" }}
                         fullWidth
+                        onChange={(e) =>
+                          setFieldValue("cardCvv", justNumber(e.target.value))
+                        }
                         disabled={chargeInfo == null}
                         onBlur={handleBlur}
                         helperText={<ErrorMessage name="cardCvv" />}

@@ -209,9 +209,6 @@ const ChargeForm = (props) => {
                     type="date"
                     InputLabelProps={{ shrink: true }}
                     value={values.birth}
-                    onChange={(e) =>
-                      setFieldValue("birth", justNumber(e.target.value))
-                    }
                     error={touched.birth && Boolean(errors.birth)}
                     helperText={touched.birth && errors.birth}
                   />
@@ -229,7 +226,6 @@ const ChargeForm = (props) => {
                     }}
                     onChange={(e) => {
                       setFieldValue("zipcode", justNumber(e.target.value));
-                      handleChange(e);
                     }}
                     error={touched.zipcode && Boolean(errors.zipcode)}
                     helperText={touched.zipcode && errors.zipcode}

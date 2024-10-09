@@ -266,24 +266,26 @@ const Invoices = () => {
             </TableHead>
             <TableBody>
               <>
-                {invoices.map((invoices) => (
-                  <TableRow style={rowStyle(invoices)} key={invoices.id}>
-                    <TableCell align="center">{invoices.id}</TableCell>
-                    <TableCell align="center">{invoices.detail}</TableCell>
-                    <TableCell style={{ fontWeight: "bold" }} align="center">
-                      {invoices.value.toLocaleString("pt-br", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </TableCell>
-                    <TableCell align="center">
-                      {moment(invoices.dueDate).format("DD/MM/YYYY")}
-                    </TableCell>
-                    <TableCell style={{ fontWeight: "bold" }} align="center">
-                      {rowStatus(invoices)}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {invoices
+                  .sort((a, b) => b.id - a.id)
+                  .map((invoices) => (
+                    <TableRow style={rowStyle(invoices)} key={invoices.id}>
+                      <TableCell align="center">{invoices.id}</TableCell>
+                      <TableCell align="center">{invoices.detail}</TableCell>
+                      <TableCell style={{ fontWeight: "bold" }} align="center">
+                        {invoices.value.toLocaleString("pt-br", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </TableCell>
+                      <TableCell align="center">
+                        {moment(invoices.dueDate).format("DD/MM/YYYY")}
+                      </TableCell>
+                      <TableCell style={{ fontWeight: "bold" }} align="center">
+                        {rowStatus(invoices)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 {loading && <TableRowSkeleton columns={4} />}
               </>
             </TableBody>

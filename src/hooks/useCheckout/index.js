@@ -92,7 +92,7 @@ const useCheckout = () => {
     return responseData;
   };
 
-  const upgradeSubscription = async (data) => {
+  const updateSubscription = async (data) => {
     const { data: responseData } = await api.request({
       url: "/upgradeSubscription",
       method: "POST",
@@ -107,6 +107,7 @@ const useCheckout = () => {
     generatePaymentToken,
     subscribe,
     unsubscribe,
+    updateSubscription,
   };
 };
 

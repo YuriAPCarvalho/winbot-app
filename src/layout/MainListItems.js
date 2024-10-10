@@ -538,7 +538,6 @@ const MainListItems = (props) => {
             />
 
             <ListItemLink
-              disabled={blockFeatures}
               to="/financeiro"
               primary={i18n.t("mainDrawer.listItems.financeiro")}
               icon={<LocalAtmIcon />}

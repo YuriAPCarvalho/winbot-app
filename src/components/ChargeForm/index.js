@@ -268,7 +268,7 @@ const ChargeForm = (props) => {
                       type="submit"
                       fullWidth
                     >
-                      SALVAR
+                      PRÓXIMO
                     </Button>
                   )}
                 </Grid>

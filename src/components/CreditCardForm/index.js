@@ -111,6 +111,8 @@ const useStyles = makeStyles((theme) => ({
   chargeArea: {
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     width: "100%",
   },
   chargeInfoForm: {

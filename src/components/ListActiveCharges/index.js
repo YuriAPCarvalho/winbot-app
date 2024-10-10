@@ -73,20 +73,6 @@ const ListActiveCharges = (props) => {
       .finally(() => setLoading(false));
   }
 
-  async function onConfirm() {
-    setLoading(true);
-    unsubscribe(user?.id)
-      .then((resp) => {
-        console.log(resp);
-        toast.success("Cancelamento Realizado com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Erro ao efetuar cancelamento!");
-      })
-      .finally(() => setLoading(false));
-  }
-
   return (
     <>
       <Box>
@@ -115,44 +101,20 @@ const ListActiveCharges = (props) => {
                 <Typography variant="h6">R${price}</Typography>
                 <Button
                   variant="contained"
+                  disabled={loading}
                   style={{ backgroundColor: "black" }}
                   onClick={() => updatePlan()}
                 >
-                  {loading ? <CircularProgress /> : "Efetuar mudança de plano"}
+                  {loading ? (
+                    <CircularProgress color="secondary" />
+                  ) : (
+                    "Efetuar mudança de plano"
+                  )}
                 </Button>
               </Box>
             )}
           </ListItem>
-          <ListItem>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <RadioButtonChecked />
-
-              <img
-                src={cardBrands(props.charges[0].cardFlag)}
-                style={{ height: 20 }}
-              />
-              <Typography>
-                {props?.charges[0]?.cardNumber
-                  .slice(-4)
-                  .padStart(props?.charges[0]?.cardNumber?.length, "*")}
-              </Typography>
-              <Typography color="textPrimary">Ativo</Typography>
-              <Button>
-                {!isSubChange && (
-                  <ConfirmUnsubscribe onConfirm={onConfirm}>
-                    {loading ? <CircularProgress /> : "Cancelar Plano"}
-                  </ConfirmUnsubscribe>
-                )}
-              </Button>
-            </Box>
-          </ListItem>
+          <ListItem></ListItem>
         </List>
       </Box>
     </>

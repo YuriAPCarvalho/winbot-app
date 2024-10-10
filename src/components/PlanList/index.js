@@ -19,11 +19,17 @@ import usePlans from "../../hooks/usePlans/index.js";
 import { List, ListItem } from "@material-ui/core";
 import { clockClasses } from "@mui/x-date-pickers";
 import BackdropLoading from "../BackdropLoading";
+import useCheckout from "../../hooks/useCheckout/index.js";
+import { toast } from "react-toastify";
 
 const PlanList = (props) => {
   const { list } = usePlans();
   const [plans, setPlans] = useState();
   const [loading, setLoading] = useState();
+  const { user } = useContext(AuthContext);
+
+  const { unsubscribe } = useCheckout();
+
   useEffect(() => {
     setLoading(true);
     list().then((result) => {
@@ -40,6 +46,20 @@ const PlanList = (props) => {
   const CancelIcon = () => {
     return <Cancel color="error" />;
   };
+
+  async function CancelSubscription() {
+    setLoading(true);
+    unsubscribe(user?.id)
+      .then((resp) => {
+        console.log(resp);
+        toast.success("Cancelamento Realizado com sucesso!");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Erro ao efetuar cancelamento!");
+      })
+      .finally(() => setLoading(false));
+  }
   return (
     <Box sx={{ flexGrow: 1, padding: 2 }}>
       {loading && <BackdropLoading />}
@@ -131,17 +151,27 @@ const PlanList = (props) => {
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{ backgroundColor: "black" }}
-                  fullWidth
-                  onClick={() => props.selectPlan(plan)}
-                >
-                  {props.Invoice?.detail == plan.name
-                    ? "Plano atual"
-                    : "Contratar Plano"}
-                </Button>
+                {props.Invoice?.detail == plan.name ? (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ backgroundColor: "black" }}
+                    fullWidth
+                    onClick={() => CancelSubscription()}
+                  >
+                    Cancelar Plano
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ backgroundColor: "black" }}
+                    fullWidth
+                    onClick={() => props.selectPlan(plan)}
+                  >
+                    Contratar Plano
+                  </Button>
+                )}
               </CardActions>
             </Card>
           </Grid>

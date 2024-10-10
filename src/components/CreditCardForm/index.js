@@ -75,7 +75,7 @@ const validationSchema = Yup.object({
   cardName: Yup.string().required("Nome no cartão é obrigatório"),
   cardDate: Yup.string()
     .required("Data de validade é obrigatória")
-    .matches(/^(0[1-9]|1[0-2])\/?([0-9]{4})$/, "Data inválida"),
+    .matches(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/, "Data inválida"),
   cardCvv: Yup.string()
     .required("CVV é obrigatório")
     .matches(/^[0-9]{3,6}$/, "Deve ter 3 ou 4 dígitos"),
@@ -125,6 +125,7 @@ const CreditCardForm = (props) => {
   const { handleLogout } = useContext(AuthContext);
   const [chargeInfo, setChargeInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [viewCheckout, setViewCheckout] = useState(false);
   const history = useHistory();
 
   const [brand, setBrand] = useState();
@@ -147,21 +148,19 @@ const CreditCardForm = (props) => {
   }
 
   const formatExpiryDate = (value, setFieldValue) => {
-    const rawValue = value.replace(/\D/g, "");
+    const rawValue = value?.replace(/\D/g, ""); // Remove caracteres não numéricos
+
     if (rawValue.length <= 2) {
-      return setFieldValue("cardDate", rawValue);
-    }
-    if (rawValue.length <= 6) {
-      return setFieldValue(
-        "cardDate",
-        `${rawValue.slice(0, 2)}/${rawValue.slice(2)}`
-      );
+      // Apenas o mês, sem formatação
+      return rawValue;
     }
 
-    return setFieldValue(
-      "cardDate",
-      `${rawValue.slice(0, 2)}/${rawValue.slice(2, 6)}`
-    );
+    if (rawValue.length > 2) {
+      // Formata o mês e os dois primeiros dígitos do ano
+      const month = rawValue?.slice(0, 2);
+      const year = rawValue?.slice(2, 4); // Apenas os dois últimos dígitos do ano
+      return `${month}/${year}`;
+    }
   };
 
   const onSubmit = async (values) => {
@@ -173,7 +172,11 @@ const CreditCardForm = (props) => {
 
     values = {
       ...values,
-      ...{ expirationMonth, expirationYear, brand: chargeInfo?.cardFlag },
+      ...{
+        expirationMonth,
+        expirationYear: `20${expirationYear}`,
+        brand: chargeInfo?.cardFlag,
+      },
     };
 
     var { payment_token } = await generatePaymentToken(values);
@@ -220,10 +223,17 @@ const CreditCardForm = (props) => {
       className={classes.root}
     >
       <Box className={classes.pixButton}>
-        <Button onClick={() => props.selectPlan(null)}>
-          <ArrowBack></ArrowBack>
-          <Typography>Planos</Typography>
-        </Button>
+        {!viewCheckout ? (
+          <Button onClick={() => props.selectPlan(null)}>
+            <ArrowBack></ArrowBack>
+            <Typography>Planos</Typography>
+          </Button>
+        ) : (
+          <Button onClick={() => setViewCheckout(false)}>
+            <ArrowBack></ArrowBack>
+            <Typography>Dados de Cobrança</Typography>
+          </Button>
+        )}
         <Button onClick={() => props.methodPix(true)}>
           <PixSVG />
           <Typography>Pagar com pix</Typography>
@@ -231,129 +241,138 @@ const CreditCardForm = (props) => {
         </Button>
       </Box>
       <Box className={classes.chargeArea}>
-        <Card className={classes.chargeInfoForm} elevation={0}>
-          <ChargeForm plan={props?.plan} setChargeInfo={setChargeInfo} />
-        </Card>
-        <Card className={classes.cardPreview} elevation={0}>
-          <CardContent>
-            <CreditCardIllustration
-              cardNumber={chargeInfo?.cardNumber}
-              cardName={chargeInfo?.cardName}
-              cardDate={chargeInfo?.cardDate}
-              brand={brand}
+        {!viewCheckout ? (
+          <Card className={classes.chargeInfoForm} elevation={0}>
+            <ChargeForm
+              plan={props?.plan}
+              setChargeInfo={setChargeInfo}
+              showCheckout={setViewCheckout}
             />
-            <Formik
-              initialValues={{
-                cardNumber: "",
-                cardName: "",
-                cardDate: "",
-                cardCvv: "",
-              }}
-              validationSchema={validationSchema}
-              onSubmit={onSubmit}
-            >
-              {({
-                isSubmitting,
-                handleChange,
-                setFieldValue,
-                handleBlur,
-                resetForm,
-                errors,
-                touched,
-              }) => (
-                <Form className={classes.formCard}>
-                  <Grid container spacing={3}>
-                    {/* Número do Cartão */}
-                    <Grid item xs={12}>
-                      <Field
-                        name="cardNumber"
-                        as={TextField}
-                        label="Número do Cartão"
-                        inputProps={{
-                          maxLength: 16,
-                          pattern: "[0-9]*",
-                        }}
-                        fullWidth
-                        disabled={chargeInfo == null}
-                        onChange={(e) =>
-                          setFieldValue(
-                            "cardNumber",
-                            justNumber(e.target.value)
-                          )
-                        }
-                        onBlur={(e) => {
-                          showBrand(e.target.value);
-                        }}
-                        helperText={<ErrorMessage name="cardNumber" />}
-                        error={touched.cardNumber && Boolean(errors.cardNumber)}
-                      />
-                    </Grid>
+          </Card>
+        ) : (
+          <Card className={classes.cardPreview} elevation={0}>
+            <CardContent>
+              <CreditCardIllustration
+                cardNumber={chargeInfo?.cardNumber}
+                cardName={chargeInfo?.cardName}
+                cardDate={chargeInfo?.cardDate}
+                brand={brand}
+              />
+              <Formik
+                initialValues={{
+                  cardNumber: "",
+                  cardName: "",
+                  cardDate: "",
+                  cardCvv: "",
+                }}
+                validationSchema={validationSchema}
+                onSubmit={onSubmit}
+              >
+                {({
+                  isSubmitting,
+                  handleChange,
+                  setFieldValue,
+                  handleBlur,
+                  resetForm,
+                  errors,
+                  touched,
+                }) => (
+                  <Form className={classes.formCard}>
+                    <Grid container spacing={3}>
+                      {/* Número do Cartão */}
+                      <Grid item xs={12}>
+                        <Field
+                          name="cardNumber"
+                          as={TextField}
+                          label="Número do Cartão"
+                          inputProps={{
+                            maxLength: 16,
+                            pattern: "[0-9]*",
+                          }}
+                          fullWidth
+                          disabled={chargeInfo == null}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "cardNumber",
+                              justNumber(e.target.value)
+                            )
+                          }
+                          onBlur={(e) => {
+                            showBrand(e.target.value);
+                          }}
+                          helperText={<ErrorMessage name="cardNumber" />}
+                          error={
+                            touched.cardNumber && Boolean(errors.cardNumber)
+                          }
+                        />
+                      </Grid>
 
-                    <Grid item xs={12}>
-                      <Field
-                        name="cardName"
-                        as={TextField}
-                        label="Nome no Cartão"
-                        fullWidth
-                        disabled={chargeInfo == null}
-                        onBlur={handleBlur}
-                        helperText={<ErrorMessage name="cardName" />}
-                        error={touched.cardName && Boolean(errors.cardName)}
-                      />
-                    </Grid>
+                      <Grid item xs={12}>
+                        <Field
+                          name="cardName"
+                          as={TextField}
+                          label="Nome no Cartão"
+                          fullWidth
+                          disabled={chargeInfo == null}
+                          onBlur={handleBlur}
+                          helperText={<ErrorMessage name="cardName" />}
+                          error={touched.cardName && Boolean(errors.cardName)}
+                        />
+                      </Grid>
 
-                    <Grid item xs={6}>
-                      <Field
-                        name="cardDate"
-                        as={TextField}
-                        label="Data de Expiração (MM/AAAA)"
-                        placeholder="00/0000"
-                        fullWidth
-                        disabled={chargeInfo == null}
-                        onChange={(e) =>
-                          formatExpiryDate(e.target.value, setFieldValue)
-                        }
-                        onBlur={handleBlur}
-                        helperText={<ErrorMessage name="cardExpiry" />}
-                        error={touched.cardDate && Boolean(errors.cardDate)}
-                      />
-                    </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          name="cardDate"
+                          as={TextField}
+                          label="Data de Expiração (MM/AAAA)"
+                          placeholder="00/00"
+                          fullWidth
+                          disabled={chargeInfo == null}
+                          onChange={(e) =>
+                            formatExpiryDate(e.target.value, setFieldValue)
+                          }
+                          onBlur={handleBlur}
+                          helperText={<ErrorMessage name="cardExpiry" />}
+                          error={touched.cardDate && Boolean(errors.cardDate)}
+                        />
+                      </Grid>
 
-                    <Grid item xs={6}>
-                      <Field
-                        name="cardCvv"
-                        as={TextField}
-                        label="CVV"
-                        inputProps={{ maxLength: 3, pattern: "[0-9]*" }}
-                        fullWidth
-                        onChange={(e) =>
-                          setFieldValue("cardCvv", justNumber(e.target.value))
-                        }
-                        disabled={chargeInfo == null}
-                        onBlur={handleBlur}
-                        helperText={<ErrorMessage name="cardCvv" />}
-                        error={touched.cardCvv && Boolean(errors.cardCvv)}
-                      />
-                    </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          name="cardCvv"
+                          as={TextField}
+                          label="CVV"
+                          inputProps={{ maxLength: 3, pattern: "[0-9]*" }}
+                          fullWidth
+                          onChange={(e) =>
+                            setFieldValue("cardCvv", justNumber(e.target.value))
+                          }
+                          disabled={chargeInfo == null}
+                          onBlur={handleBlur}
+                          helperText={<ErrorMessage name="cardCvv" />}
+                          error={touched.cardCvv && Boolean(errors.cardCvv)}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12}>
-                      <Button
-                        sx={{ backgroundColor: "black" }}
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        disabled={chargeInfo == null}
-                      >
-                        {loading ? "Processando..." : "Pagar"}
-                      </Button>
+                      <Grid item xs={12}>
+                        <Button
+                          sx={{ backgroundColor: "black" }}
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          fullWidth
+                          disabled={chargeInfo == null || loading}
+                        >
+                          {loading ? "Processando..." : "Pagar"}
+                        </Button>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Form>
-              )}
-            </Formik>
-          </CardContent>
-        </Card>
+                  </Form>
+                )}
+              </Formik>
+            </CardContent>
+          </Card>
+        )}
       </Box>
     </Box>
   );

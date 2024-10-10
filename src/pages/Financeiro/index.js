@@ -31,6 +31,9 @@ import CheckoutPage from "../../components/CheckoutPage";
 import ListActiveCharges from "../../components/ListActiveCharges";
 import useChargeInfo from "../../hooks/useChargeInfo";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import { RadioButtonChecked } from "@material-ui/icons";
+import cardBrands from "../../helpers/cardBrands";
+import useCheckout from "../../hooks/useCheckout";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_INVOICES") {
@@ -238,7 +241,30 @@ const Invoices = () => {
             />
           )}
         </Paper>
+        <Paper>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-around",
+              padding: "10px",
+              alignItems: "center",
+            }}
+          >
+            <RadioButtonChecked />
 
+            <img
+              src={cardBrands(charges[0]?.cardFlag)}
+              style={{ height: 20 }}
+            />
+            <Typography>
+              {charges[0]?.cardNumber
+                ?.slice(-4)
+                .padStart(charges[0]?.cardNumber?.length, "*")}
+            </Typography>
+            <Typography color="textPrimary">Ativo</Typography>
+          </Box>
+        </Paper>
         <Paper
           className={classes.mainPaper}
           variant="outlined"

@@ -111,15 +111,18 @@ const ChargeForm = (props) => {
   }, []);
 
   const handleCEPChange = async (e, setFieldValue) => {
+    setLoading(true);
     var cep = e.target.value;
 
-    await handleZipcodeChange(cep).then((res) => {
-      if (res.state == "" || res.city == "") {
-        toast.error("CEP Inválido");
-      } else {
-        setInitialValues({ ...initialValues, ...res });
-      }
-    });
+    await handleZipcodeChange(cep)
+      .then((res) => {
+        if (res.state == "" || res.city == "") {
+          toast.error("CEP Inválido");
+        } else {
+          setInitialValues({ ...initialValues, ...res });
+        }
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleSubmit = async (values) => {
@@ -136,6 +139,7 @@ const ChargeForm = (props) => {
           props.setChargeInfo(res);
 
           toast.success("Atualizado com sucesso");
+          props.showCheckout(true);
         })
         .catch((err) => {
           toast.error(err);
@@ -145,6 +149,9 @@ const ChargeForm = (props) => {
       await save(body)
         .then((res) => {
           if (res) {
+            toast.success("Salvo com sucesso");
+            props.showCheckout(true);
+
             props.setChargeInfo(res);
           }
         })

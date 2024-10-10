@@ -22,7 +22,7 @@ export function useDate() {
     return strDate;
   }
 
-  function dateIsBeforeToday(strDate) {
+  function todayIsBefore(strDate) {
     return moment(moment().format()).isBefore(strDate);
   }
 
@@ -30,6 +30,6 @@ export function useDate() {
     dateToClient,
     datetimeToClient,
     dateToDatabase,
-    dateIsBeforeToday,
+    todayIsBefore,
   };
 }

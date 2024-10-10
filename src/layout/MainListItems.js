@@ -64,19 +64,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ListItemLink(props) {
-  const { user } = useContext(AuthContext);
-  const { dateIsBeforeToday } = useDate();
-  const { icon, primary, to, className } = props;
-  const { find } = useCompanies();
-  const [blockFeatures, setBlockFeatures] = useState();
+  const { icon, primary, to, className, disabled } = props;
 
-  useEffect(() => {}, [user]);
-
-  useEffect(() => {
-    find(user?.company?.id).then((resp) => {
-      setBlockFeatures(dateIsBeforeToday(resp?.dueDate));
-    });
-  }, []);
   const renderLink = React.useMemo(
     () =>
       React.forwardRef((itemProps, ref) => (
@@ -88,7 +77,7 @@ function ListItemLink(props) {
   return (
     <li>
       <ListItem
-        disabled={primary.includes("Financeiro") ? false : !blockFeatures}
+        disabled={disabled}
         button
         dense
         component={renderLink}
@@ -182,9 +171,19 @@ const MainListItems = (props) => {
   const [version, setVersion] = useState(false);
 
   const { getVersion } = useVersion();
+  const { find } = useCompanies();
+  const [blockFeatures, setBlockFeatures] = useState();
+  const { todayIsBefore } = useDate();
+
+  useEffect(() => {}, [user]);
 
   const socketManager = useContext(SocketContext);
 
+  useEffect(() => {
+    find(user?.company?.id).then((resp) => {
+      setBlockFeatures(!todayIsBefore(resp?.dueDate));
+    });
+  }, []);
   useEffect(() => {
     async function fetchVersion() {
       const _version = await getVersion();
@@ -310,6 +309,7 @@ const MainListItems = (props) => {
         perform="dashboard:view"
         yes={() => (
           <ListItemLink
+            disabled={blockFeatures}
             to="/"
             primary="Dashboard"
             icon={<DashboardOutlinedIcon />}
@@ -318,6 +318,7 @@ const MainListItems = (props) => {
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/tickets"
         primary={i18n.t("mainDrawer.listItems.tickets")}
         icon={<WhatsAppIcon />}
@@ -325,6 +326,7 @@ const MainListItems = (props) => {
 
       {showKanban && (
         <ListItemLink
+          disabled={blockFeatures}
           to="/kanban"
           primary={i18n.t("Kanban")}
           icon={<TableChartIcon />}
@@ -332,36 +334,42 @@ const MainListItems = (props) => {
       )}
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/quick-messages"
         primary={i18n.t("mainDrawer.listItems.quickMessages")}
         icon={<FlashOnIcon />}
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/todolist"
         primary={i18n.t("Tarefas")}
         icon={<BorderColorIcon />}
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/contacts"
         primary={i18n.t("mainDrawer.listItems.contacts")}
         icon={<ContactPhoneOutlinedIcon />}
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/schedules"
         primary={i18n.t("mainDrawer.listItems.schedules")}
         icon={<EventIcon />}
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/tags"
         primary={i18n.t("mainDrawer.listItems.tags")}
         icon={<LocalOfferIcon />}
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/chats"
         primary={i18n.t("mainDrawer.listItems.chats")}
         icon={
@@ -372,6 +380,7 @@ const MainListItems = (props) => {
       />
 
       <ListItemLink
+        disabled={blockFeatures}
         to="/helps"
         primary={i18n.t("mainDrawer.listItems.helps")}
         icon={<HelpOutlineIcon />}
@@ -400,6 +409,7 @@ const MainListItems = (props) => {
             {showCampaigns && (
               <>
                 <ListItem
+                  disabled={blockFeatures}
                   button
                   onClick={() => setOpenCampaignSubmenu((prev) => !prev)}
                 >
@@ -422,13 +432,18 @@ const MainListItems = (props) => {
                   unmountOnExit
                 >
                   <List component="div" disablePadding>
-                    <ListItem onClick={() => history.push("/campaigns")} button>
+                    <ListItem
+                      disabled={blockFeatures}
+                      onClick={() => history.push("/campaigns")}
+                      button
+                    >
                       <ListItemIcon>
                         <ListIcon />
                       </ListItemIcon>
                       <ListItemText primary="Listagem" />
                     </ListItem>
                     <ListItem
+                      disabled={blockFeatures}
                       onClick={() => history.push("/contact-lists")}
                       button
                     >
@@ -438,6 +453,7 @@ const MainListItems = (props) => {
                       <ListItemText primary="Listas de Contatos" />
                     </ListItem>
                     <ListItem
+                      disabled={blockFeatures}
                       onClick={() => history.push("/campaigns-config")}
                       button
                     >
@@ -452,6 +468,7 @@ const MainListItems = (props) => {
             )}
             {user.super && (
               <ListItemLink
+                disabled={blockFeatures}
                 to="/announcements"
                 primary={i18n.t("mainDrawer.listItems.annoucements")}
                 icon={<AnnouncementIcon />}
@@ -459,6 +476,7 @@ const MainListItems = (props) => {
             )}
             {showOpenAi && (
               <ListItemLink
+                disabled={blockFeatures}
                 to="/prompts"
                 primary={i18n.t("mainDrawer.listItems.prompts")}
                 icon={<AllInclusive />}
@@ -467,12 +485,14 @@ const MainListItems = (props) => {
 
             {showIntegrations && (
               <ListItemLink
+                disabled={blockFeatures}
                 to="/queue-integration"
                 primary={i18n.t("mainDrawer.listItems.queueIntegration")}
                 icon={<DeviceHubOutlined />}
               />
             )}
             <ListItemLink
+              disabled={blockFeatures}
               to="/connections"
               primary={i18n.t("mainDrawer.listItems.connections")}
               icon={
@@ -482,16 +502,19 @@ const MainListItems = (props) => {
               }
             />
             <ListItemLink
+              disabled={blockFeatures}
               to="/files"
               primary={i18n.t("mainDrawer.listItems.files")}
               icon={<AttachFile />}
             />
             <ListItemLink
+              disabled={blockFeatures}
               to="/queues"
               primary={i18n.t("mainDrawer.listItems.queues")}
               icon={<AccountTreeOutlinedIcon />}
             />
             <ListItemLink
+              disabled={blockFeatures}
               to="/users"
               primary={i18n.t("mainDrawer.listItems.users")}
               icon={<PeopleAltOutlinedIcon />}
@@ -499,6 +522,7 @@ const MainListItems = (props) => {
             {showExternalApi && (
               <>
                 <ListItemLink
+                  disabled={blockFeatures}
                   to="/messages-api"
                   primary={i18n.t("mainDrawer.listItems.messagesAPI")}
                   icon={<CodeRoundedIcon />}
@@ -507,12 +531,14 @@ const MainListItems = (props) => {
             )}
 
             <ListItemLink
+              disabled={blockFeatures}
               to="/settings"
               primary={i18n.t("mainDrawer.listItems.settings")}
               icon={<SettingsOutlinedIcon />}
             />
 
             <ListItemLink
+              disabled={blockFeatures}
               to="/financeiro"
               primary={i18n.t("mainDrawer.listItems.financeiro")}
               icon={<LocalAtmIcon />}

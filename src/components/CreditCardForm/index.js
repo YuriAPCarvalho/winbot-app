@@ -73,9 +73,7 @@ function formatNumCard(cardNumber) {
 const validationSchema = Yup.object({
   cardNumber: Yup.string().required("Número do cartão é obrigatório"),
   cardName: Yup.string().required("Nome no cartão é obrigatório"),
-  cardDate: Yup.string()
-    .required("Data de validade é obrigatória")
-    .matches(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/, "Data inválida"),
+  cardDate: Yup.string().required("Data de validade é obrigatória"),
   cardCvv: Yup.string()
     .required("CVV é obrigatório")
     .matches(/^[0-9]{3,6}$/, "Deve ter 3 ou 4 dígitos"),
@@ -154,14 +152,13 @@ const CreditCardForm = (props) => {
 
     if (rawValue.length <= 2) {
       // Apenas o mês, sem formatação
-      return rawValue;
+      setFieldValue("cardDate", rawValue);
     }
 
     if (rawValue.length > 2) {
-      // Formata o mês e os dois primeiros dígitos do ano
       const month = rawValue?.slice(0, 2);
       const year = rawValue?.slice(2, 4); // Apenas os dois últimos dígitos do ano
-      return `${month}/${year}`;
+      setFieldValue("cardDate", `${month}/${year}`);
     }
   };
 

@@ -241,7 +241,7 @@ const Invoices = () => {
             />
           )}
         </Paper>
-        {charges.length > 0 ? (
+        {charges[0]?.cardFlag != null ? (
           <Paper style={{ marginBottom: "20px" }}>
             <Box
               sx={{

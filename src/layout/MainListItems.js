@@ -175,8 +175,6 @@ const MainListItems = (props) => {
   const [blockFeatures, setBlockFeatures] = useState();
   const { todayIsBefore } = useDate();
 
-  useEffect(() => {}, [user]);
-
   const socketManager = useContext(SocketContext);
 
   useEffect(() => {

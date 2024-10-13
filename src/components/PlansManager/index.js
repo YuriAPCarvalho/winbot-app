@@ -343,12 +343,8 @@ export function PlanManagerForm(props) {
                   name="term"
                   margin="dense"
                 >
-                  <MenuItem value={true}>
-                    {i18n.t("plans.form.enabled")}
-                  </MenuItem>
-                  <MenuItem value={false}>
-                    {i18n.t("plans.form.disabled")}
-                  </MenuItem>
+                  <MenuItem value={"MENSAL"}>MENSAL</MenuItem>
+                  <MenuItem value={"ANUAL"}>ANUAL</MenuItem>
                 </Field>
               </FormControl>
             </Grid>

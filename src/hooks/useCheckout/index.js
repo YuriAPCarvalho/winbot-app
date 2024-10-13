@@ -26,7 +26,7 @@ const useCheckout = () => {
       const installments = await EfiPay.CreditCard.setAccount(
         "Identificador_de_conta_aqui"
       )
-        .setEnvironment("production") // 'production' or 'sandbox'
+        .setEnvironment("sandbox") // 'production' or 'sandbox'
         .setBrand("visa")
         .setTotal(28990)
         .getInstallments();

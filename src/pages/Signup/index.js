@@ -104,6 +104,8 @@ const SignUp = () => {
       toast.success(i18n.t("signup.toasts.success"));
       history.push("/login");
     } catch (err) {
+      setLoading(false);
+
       console.log(err);
       toastError(err);
     }

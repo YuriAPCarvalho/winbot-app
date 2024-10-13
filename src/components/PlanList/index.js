@@ -151,7 +151,7 @@ const PlanList = (props) => {
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>
-                {props.Invoice?.detail == plan.name ? (
+                {props.Invoice?.detail === plan?.name ? (
                   <Button
                     variant="contained"
                     color="primary"

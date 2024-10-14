@@ -199,7 +199,7 @@ const CreditCardForm = (props) => {
         planName: props.plan?.name,
         planValue: props.plan?.value,
         cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
-        name: values?.cardName,
+        cardName: values?.cardName,
       },
     })
       .then((res) => {

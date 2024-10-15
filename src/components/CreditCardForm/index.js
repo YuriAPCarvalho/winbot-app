@@ -198,7 +198,7 @@ const CreditCardForm = (props) => {
       ...{
         payment_token,
         bankPlanID: props.plan?.bankPlanID,
-        planID: props.plan?.id,
+        planId: props.plan?.id,
         planName: props.plan?.name,
         planValue: props.plan?.value,
         cardNumber: values?.cardNumber?.replace(/\s+/g, ""),

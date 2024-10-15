@@ -21,14 +21,14 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom";
 const ListActiveCharges = (props) => {
   const { user } = useContext(AuthContext);
   const { unsubscribe, updateSubscription } = useCheckout();
-  const [isSubChange, setIsSubChange] = useState(false);
+  const [isSubChange, setIsSubChange] = useState(true);
   const [price, setPrice] = useState(null);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
-    if (props.Invoice?.detail != props?.plan?.name) {
-      setIsSubChange(true);
+    if (props.Invoice?.detail === props?.plan?.name) {
+      setIsSubChange(false);
       setPrice(GetPrice());
     }
   }, []);
@@ -55,21 +55,27 @@ const ListActiveCharges = (props) => {
 
     const { bankPlanID, name, id } = props.plan;
     const { companyId, dueDate } = props.Invoice;
-
-    await updateSubscription({
-      companyId,
-      bankPlanID,
-      planId: id,
-      planName: name,
-      dueDate,
-      planValue: price,
-    })
-      .then((resp) => {
+    try {
+      let response = await updateSubscription({
+        companyId,
+        bankPlanID,
+        planId: id,
+        planName: name,
+        dueDate,
+        planValue: price,
+      });
+      if (response.status == 200) {
         toast.success("Plano atualizado com sucesso!");
         history.push("/financeiro");
-      })
-      .catch(() => toast.error("Não foi possível efetuar a mudança de plano!"))
-      .finally(() => setLoading(false));
+      } else {
+        toast.error("Não foi possível efetuar a mudança de plano!");
+      }
+
+      setLoading(false);
+    } catch (error) {
+      toast.error("Erro ao efetuar a mudança de plano!");
+      setLoading(false);
+    }
   }
 
   return (

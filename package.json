@@ -26,6 +26,7 @@
     "cross-env": "^7.0.3",
     "date-fns": "^2.16.1",
     "emoji-mart": "^3.0.0",
+    "env-cmd": "^10.1.0",
     "formik": "^2.2.0",
     "formik-material-ui": "^3.0.1",
     "gn-api-sdk-node": "^3.0.2",
@@ -70,8 +71,8 @@
     "yup": "^0.32.8"
   },
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider CARDTOKEN=sandbox react-scripts start",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider CARDTOKEN=sandbox GENERATE_SOURCEMAP=false react-scripts build",
+    "start": "env-cmd -f .env cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "env-cmd -f .env cross-env NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false react-scripts build",
     "builddev": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

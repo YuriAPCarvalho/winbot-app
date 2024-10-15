@@ -53,12 +53,13 @@ const ListActiveCharges = (props) => {
   async function updatePlan() {
     setLoading(true);
 
-    const { bankPlanID, name } = props.plan;
+    const { bankPlanID, name, id } = props.plan;
     const { companyId, dueDate } = props.Invoice;
 
     await updateSubscription({
       companyId,
       bankPlanID,
+      planId: id,
       planName: name,
       dueDate,
       planValue: price,

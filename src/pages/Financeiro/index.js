@@ -218,10 +218,7 @@ const Invoices = () => {
           onScroll={handleScroll}
         >
           {selectedPlan == null ? (
-            <PlanList
-              selectPlan={setSelectedPlan}
-              Invoices={invoices[invoices.length - 1]}
-            />
+            <PlanList selectPlan={setSelectedPlan} invoices={invoices} />
           ) : methodPix ? (
             <CheckoutPage
               Invoice={storagePlans}

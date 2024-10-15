@@ -22,19 +22,29 @@ import BackdropLoading from "../BackdropLoading";
 import useCheckout from "../../hooks/useCheckout/index.js";
 import { toast } from "react-toastify";
 import useInvoices from "../../hooks/useInvoices/index.js";
+import api from "../../services/api.js";
+import useCompanies from "../../hooks/useCompanies/index.js";
+import { useDate } from "../../hooks/useDate/index.js";
 
 const PlanList = (props) => {
   const { list } = usePlans();
   const [plans, setPlans] = useState();
   const [invoice, setInvoice] = useState();
-
+  const [company, setCompany] = useState();
   const [loading, setLoading] = useState();
-  const { user } = useContext(AuthContext);
+  const { user, companyId } = useContext(AuthContext);
   const { listInvoice } = useInvoices();
+  const { todayIsBefore } = useDate();
+  const { find } = useCompanies();
 
   const { unsubscribe } = useCheckout();
 
   useEffect(() => {
+    find(localStorage.getItem("companyId")).then((result) => {
+      console.log(result);
+
+      setCompany(result);
+    });
     setLoading(true);
     list().then((result) => {
       console.log(result);
@@ -156,8 +166,8 @@ const PlanList = (props) => {
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>
-                {props?.Invoice?.detail === plan?.name &&
-                props?.Invoice?.status === "paid" ? (
+                {todayIsBefore(company?.dueDate) &&
+                plan?.id == company?.planId ? (
                   <Button
                     variant="contained"
                     color="primary"

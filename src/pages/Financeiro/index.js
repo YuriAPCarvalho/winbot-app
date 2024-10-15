@@ -34,6 +34,7 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import { RadioButtonChecked } from "@material-ui/icons";
 import cardBrands from "../../helpers/cardBrands";
 import useCheckout from "../../hooks/useCheckout";
+import useInvoices from "../../hooks/useInvoices";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_INVOICES") {
@@ -110,6 +111,7 @@ const Invoices = () => {
   const [charges, setCharges] = useState([]);
   const { findChargesByCompany } = useChargeInfo();
   const { user } = useContext(AuthContext);
+  const { removeOpens } = useInvoices();
 
   const handleOpenContactModal = (invoices) => {
     setStoragePlans(invoices);
@@ -127,6 +129,8 @@ const Invoices = () => {
       setCharges(res);
       console.log(res);
     });
+
+    removeOpens();
   }, []);
 
   useEffect(() => {

@@ -56,12 +56,20 @@ const useInvoices = () => {
     return data;
   };
 
+  const removeOpens = async () => {
+    const { data } = await api.request({
+      url: `/invoices`,
+      method: "POST",
+    });
+    return data;
+  };
   return {
     getLastInvoice,
     listInvoice,
     save,
     update,
     remove,
+    removeOpens,
   };
 };
 

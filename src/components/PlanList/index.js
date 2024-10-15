@@ -41,13 +41,10 @@ const PlanList = (props) => {
 
   useEffect(() => {
     find(localStorage.getItem("companyId")).then((result) => {
-      console.log(result);
-
       setCompany(result);
     });
     setLoading(true);
     list().then((result) => {
-      console.log(result);
       setLoading(false);
       setPlans(result.reverse());
     });
@@ -65,12 +62,10 @@ const PlanList = (props) => {
     setLoading(true);
     unsubscribe(user?.id)
       .then((resp) => {
-        console.log(resp);
         window.location.reload();
         toast.success("Cancelamento Realizado com sucesso!");
       })
       .catch((err) => {
-        console.log(err);
         toast.error("Erro ao efetuar cancelamento!");
       })
       .finally(() => setLoading(false));

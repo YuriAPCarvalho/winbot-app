@@ -10,14 +10,9 @@ const useCheckout = () => {
         cardNumber
       ).verifyCardBrand();
 
-      console.log("Bandeira: ", brand);
-
       return brand;
     } catch (error) {
       toastError("Bandeira não identificada!");
-      console.log("Código: ", error.code);
-      console.log("Nome: ", error.error);
-      console.log("Mensagem: ", error.error_description);
     }
   }
 
@@ -30,13 +25,7 @@ const useCheckout = () => {
         .setBrand("visa")
         .setTotal(28990)
         .getInstallments();
-
-      console.log("Parcelas", installments);
-    } catch (error) {
-      console.log("Código: ", error.code);
-      console.log("Nome: ", error.error);
-      console.log("Mensagem: ", error.error_description);
-    }
+    } catch (error) {}
   }
 
   async function generatePaymentToken({
@@ -64,9 +53,6 @@ const useCheckout = () => {
 
       const payment_token = result.payment_token;
       const card_mask = result.card_mask;
-
-      console.log("payment_token", payment_token);
-      console.log("card_mask", card_mask);
 
       return { payment_token, card_mask };
     } catch (error) {

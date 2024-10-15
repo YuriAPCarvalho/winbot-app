@@ -21,14 +21,14 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom";
 const ListActiveCharges = (props) => {
   const { user } = useContext(AuthContext);
   const { unsubscribe, updateSubscription } = useCheckout();
-  const [isSubChange, setIsSubChange] = useState(true);
+  const [isSubChange, setIsSubChange] = useState(false);
   const [price, setPrice] = useState(null);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
-    if (props.Invoice?.detail === props?.plan?.name) {
-      setIsSubChange(false);
+    if (!props.Invoice?.detail.includes(props?.plan?.name)) {
+      setIsSubChange(true);
       setPrice(GetPrice());
     }
   }, []);

@@ -55,27 +55,22 @@ const ListActiveCharges = (props) => {
 
     const { bankPlanID, name, id } = props.plan;
     const { companyId, dueDate } = props.Invoice;
-    try {
-      let response = await updateSubscription({
-        companyId,
-        bankPlanID,
-        planId: id,
-        planName: name,
-        dueDate,
-        planValue: price,
-      });
-      if (response.status == 200) {
+    await updateSubscription({
+      companyId,
+      bankPlanID,
+      planId: id,
+      planName: name,
+      dueDate,
+      planValue: price,
+    })
+      .then((resp) => {
         toast.success("Plano atualizado com sucesso!");
-        history.push("/financeiro");
-      } else {
+        window.location.reload();
+      })
+      .catch((err) => {
         toast.error("Não foi possível efetuar a mudança de plano!");
-      }
-
-      setLoading(false);
-    } catch (error) {
-      toast.error("Erro ao efetuar a mudança de plano!");
-      setLoading(false);
-    }
+      })
+      .finally(() => setLoading(false));
   }
 
   return (

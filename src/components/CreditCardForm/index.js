@@ -164,60 +164,66 @@ const CreditCardForm = (props) => {
   };
 
   const onSubmit = async (values) => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    var expirationMonth = values.cardDate.split("/")[0];
+      var expirationMonth = values.cardDate.split("/")[0];
 
-    var expirationYear = values.cardDate.split("/")[1];
+      var expirationYear = values.cardDate.split("/")[1];
 
-    values = {
-      ...values,
-      ...{
-        expirationMonth,
-        expirationYear: `20${expirationYear}`,
-        brand: chargeInfo?.cardFlag,
-      },
-    };
+      values = {
+        ...values,
+        ...{
+          expirationMonth,
+          expirationYear: `20${expirationYear}`,
+          brand: chargeInfo?.cardFlag,
+        },
+      };
 
-    var { payment_token } = await generatePaymentToken(values);
+      var { payment_token } = await generatePaymentToken(values);
 
-    setChargeInfo({
-      ...chargeInfo,
-      ...{
-        payment_token,
-        bankPlanID: props.plan?.bankPlanID,
-        planID: props.plan?.id,
-        planName: props.plan?.name,
-        planValue: props.plan?.value,
-        cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
-      },
-    });
-
-    await subscribe({
-      ...chargeInfo,
-      ...{
-        payment_token,
-        bankPlanID: props.plan?.bankPlanID,
-        planId: props.plan?.id,
-        planName: props.plan?.name,
-        planValue: props.plan?.value,
-        cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
-        cardName: values?.cardName,
-      },
-    })
-      .then((res) => {
-        toast.success("Operação efetuada com sucesso!");
-        setLoading(false);
-
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.log(err);
-
-        setLoading(false);
-
-        toast.error("Não foi possível completar a operação, confira os dados!");
+      setChargeInfo({
+        ...chargeInfo,
+        ...{
+          payment_token,
+          bankPlanID: props.plan?.bankPlanID,
+          planID: props.plan?.id,
+          planName: props.plan?.name,
+          planValue: props.plan?.value,
+          cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
+        },
       });
+
+      await subscribe({
+        ...chargeInfo,
+        ...{
+          payment_token,
+          bankPlanID: props.plan?.bankPlanID,
+          planId: props.plan?.id,
+          planName: props.plan?.name,
+          planValue: props.plan?.value,
+          cardNumber: values?.cardNumber?.replace(/\s+/g, ""),
+          cardName: values?.cardName,
+        },
+      })
+        .then((res) => {
+          toast.success("Operação efetuada com sucesso!");
+          setLoading(false);
+
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+
+          setLoading(false);
+
+          toast.error(
+            "Não foi possível completar a operação, confira os dados!"
+          );
+        });
+    } catch (err) {
+      setLoading(false);
+    }
   };
   return (
     <Box

@@ -21,12 +21,16 @@ import { clockClasses } from "@mui/x-date-pickers";
 import BackdropLoading from "../BackdropLoading";
 import useCheckout from "../../hooks/useCheckout/index.js";
 import { toast } from "react-toastify";
+import useInvoices from "../../hooks/useInvoices/index.js";
 
 const PlanList = (props) => {
   const { list } = usePlans();
   const [plans, setPlans] = useState();
+  const [invoice, setInvoice] = useState();
+
   const [loading, setLoading] = useState();
   const { user } = useContext(AuthContext);
+  const { listInvoice } = useInvoices();
 
   const { unsubscribe } = useCheckout();
 
@@ -52,6 +56,7 @@ const PlanList = (props) => {
     unsubscribe(user?.id)
       .then((resp) => {
         console.log(resp);
+        window.location.reload();
         toast.success("Cancelamento Realizado com sucesso!");
       })
       .catch((err) => {
@@ -151,8 +156,8 @@ const PlanList = (props) => {
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>
-                {props.Invoice?.detail === plan?.name &&
-                props.Invoice?.status !== "canceled" ? (
+                {props?.Invoice?.detail === plan?.name &&
+                props?.Invoice?.status === "paid" ? (
                   <Button
                     variant="contained"
                     color="primary"

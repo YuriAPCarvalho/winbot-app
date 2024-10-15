@@ -142,6 +142,8 @@ const Invoices = () => {
           const { data } = await api.get("/invoices/all", {
             params: { searchParam, pageNumber },
           });
+          console.log(data);
+
           dispatch({ type: "LOAD_INVOICES", payload: data });
           setHasMore(data.hasMore);
           setLoading(false);
@@ -218,7 +220,7 @@ const Invoices = () => {
           {selectedPlan == null ? (
             <PlanList
               selectPlan={setSelectedPlan}
-              Invoice={invoices[invoices.length - 1]}
+              Invoices={invoices[invoices.length - 1]}
             />
           ) : methodPix ? (
             <CheckoutPage

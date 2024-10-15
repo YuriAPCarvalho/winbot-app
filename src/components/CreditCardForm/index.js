@@ -13,6 +13,7 @@ import {
   CardContent,
   InputAdornment,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -354,16 +355,20 @@ const CreditCardForm = (props) => {
                       </Grid>
 
                       <Grid item xs={12}>
-                        <Button
-                          sx={{ backgroundColor: "black" }}
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          fullWidth
-                          disabled={chargeInfo == null || loading}
-                        >
-                          {loading ? "Processando..." : "Pagar"}
-                        </Button>
+                        {!loading ? (
+                          <Button
+                            sx={{ backgroundColor: "black" }}
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            disabled={chargeInfo == null || loading}
+                          >
+                            Pagar
+                          </Button>
+                        ) : (
+                          <CircularProgress />
+                        )}
                       </Grid>
                     </Grid>
                   </Form>

@@ -65,10 +65,8 @@ const ListActiveCharges = (props) => {
       planValue: price,
     })
       .then((resp) => {
-        if (resp.status == 200) {
-          toast.success("Plano atualizado com sucesso!");
-          history.push("/financeiro");
-        }
+        toast.success("Plano atualizado com sucesso!");
+        history.push("/financeiro");
       })
       .catch(() => toast.error("Não foi possível efetuar a mudança de plano!"))
       .finally(() => setLoading(false));

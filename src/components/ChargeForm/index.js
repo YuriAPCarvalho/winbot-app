@@ -166,7 +166,8 @@ const ChargeForm = (props) => {
     <Container maxWidth="sm">
       <Box sx={{ mt: 5 }}>
         <Typography variant="h4" gutterBottom>
-          {props?.plan?.name}
+          {props?.plan?.name}/
+          {props?.plan?.term.includes("MENSAL") ? "mês" : "ano"}
         </Typography>
         <Typography variant="h4" fontWeight={12} gutterBottom>
           {props?.plan?.value.toLocaleString("pt-BR", {

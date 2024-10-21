@@ -161,7 +161,7 @@ const PlanList = (props) => {
                     style: "currency",
                     currency: "BRL",
                   })}
-                  /{props?.plan?.term.includes("MENSAL") ? "mês" : "ano"}
+                  /{plan?.term.includes("MENSAL") ? "mês" : "ano"}
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>

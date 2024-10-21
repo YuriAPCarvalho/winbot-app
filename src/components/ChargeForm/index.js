@@ -169,7 +169,10 @@ const ChargeForm = (props) => {
           {props?.plan?.name}
         </Typography>
         <Typography variant="h4" fontWeight={12} gutterBottom>
-          R${props?.plan?.value},00/mês
+          {props?.plan?.value.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
         </Typography>
         <Typography variant="h6" gutterBottom>
           Informe os dados da cobrança

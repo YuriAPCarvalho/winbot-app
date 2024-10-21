@@ -242,11 +242,11 @@ const CreditCardForm = (props) => {
             <Typography>Dados de Cobrança</Typography>
           </Button>
         )}
-        <Button onClick={() => props.methodPix(true)}>
+        {/* <Button onClick={() => props.methodPix(true)}>
           <PixSVG />
           <Typography>Pagar com pix</Typography>
           <ArrowForward></ArrowForward>
-        </Button>
+        </Button> */}
       </Box>
       <Box className={classes.chargeArea}>
         {!viewCheckout ? (

@@ -223,13 +223,14 @@ const Invoices = () => {
         >
           {selectedPlan == null ? (
             <PlanList selectPlan={setSelectedPlan} invoices={invoices} />
-          ) : methodPix ? (
-            <CheckoutPage
-              Invoice={storagePlans}
-              methodPix={setMethodPix}
-              selectPlan={setSelectedPlan}
-            />
-          ) : charges.some((c) => c.cardNumber != null) ? (
+          ) : // methodPix ? (
+          //   <CheckoutPage
+          //     Invoice={storagePlans}
+          //     methodPix={setMethodPix}
+          //     selectPlan={setSelectedPlan}
+          //   />
+          // ) :
+          charges.some((c) => c.cardNumber != null) ? (
             <ListActiveCharges
               selectPlan={setSelectedPlan}
               charges={charges}

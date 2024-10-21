@@ -166,14 +166,14 @@ const ChargeForm = (props) => {
     <Container maxWidth="sm">
       <Box sx={{ mt: 5 }}>
         <Typography variant="h4" gutterBottom>
-          {props?.plan?.name}/
-          {props?.plan?.term.includes("MENSAL") ? "mês" : "ano"}
+          {props?.plan?.name}
         </Typography>
         <Typography variant="h4" fontWeight={12} gutterBottom>
           {props?.plan?.value.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
           })}
+          /{props?.plan?.term.includes("MENSAL") ? "mês" : "ano"}
         </Typography>
         <Typography variant="h6" gutterBottom>
           Informe os dados da cobrança

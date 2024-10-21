@@ -108,14 +108,7 @@ const ChargeForm = (props) => {
           .finally(() => setLoading(false));
       }),
     ]);
-  }, [
-    find,
-    findChargesByCompany,
-    getCurrentUserInfo,
-    initialValues,
-    props,
-    user.companyId,
-  ]);
+  }, []);
 
   const handleCEPChange = async (e, setFieldValue) => {
     setLoading(true);
@@ -176,7 +169,7 @@ const ChargeForm = (props) => {
           {props?.plan?.name}
         </Typography>
         <Typography variant="h4" fontWeight={12} gutterBottom>
-          R${props?.plan?.value}0/mês
+          R${props?.plan?.value},00/mês
         </Typography>
         <Typography variant="h6" gutterBottom>
           Informe os dados da cobrança

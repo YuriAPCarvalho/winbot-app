@@ -157,7 +157,7 @@ const PlanList = (props) => {
                   align="center"
                   sx={{ marginTop: 2 }}
                 >
-                  {props?.plan?.value.toLocaleString("pt-BR", {
+                  {plan?.value.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}

@@ -157,7 +157,10 @@ const PlanList = (props) => {
                   align="center"
                   sx={{ marginTop: 2 }}
                 >
-                  R${plan.value},00/mês
+                  {props?.plan?.value.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
                 </Typography>
               </CardContent>
               <CardActions sx={{ marginTop: "auto" }}>
